@@ -222,11 +222,14 @@ function resetAll(){
 
 document.addEventListener('contextmenu', function(e){
   e.preventDefault();
+
+  if(drawing) return;
+
   paused=!paused;
 
   if(paused){
     document.getElementById('flashPlayer').textContent='⏸ PAUSED';
-    document.getElementById('flashPotA').textContent='Right click again to resume';
+    document.getElementById('flashPotA').textContent='Right click to resume';
     document.getElementById('flashPotB').textContent='';
     document.getElementById('resultFlash').style.display='flex';
   }else{
