@@ -87,6 +87,9 @@ th,td{
 <h2>Draw Table (<span id="progress">0</span>/24)</h2>
 
 <table>
+  <div style="text-align:center;margin-top:20px;">
+  <button onclick="copyResults()">Copy Results</button>
+</div>
 <thead><tr><th>#</th><th>Player</th><th>Pot A</th><th>Pot B</th></tr></thead>
 <tbody id="resultsBody"></tbody>
 </table>
@@ -278,7 +281,19 @@ function resetAll(){
     document.getElementById('potBWheel').textContent='—';
   },10);
 }
+function copyResults(){
+  let rows=document.querySelectorAll('#resultsBody tr');
+  let text="Cerro Gordo World Cup Sweepstake Results\n\n";
 
+  rows.forEach(row=>{
+    let cols=row.querySelectorAll('td');
+    text += `${cols[0].innerText}. ${cols[1].innerText} - ${cols[2].innerText} / ${cols[3].innerText}\n`;
+  });
+
+  navigator.clipboard.writeText(text).then(()=>{
+    alert("Results copied to clipboard!");
+  });
+}
 </script>
 
 </body>
