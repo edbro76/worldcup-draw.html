@@ -216,14 +216,23 @@ function resetAll(){
   players=[...playersSeed];
   potA=[...potASeed];
   potB=[...potBSeed];
-  count=0; paused=false; drawing=false; musicStarted=false;
+  count=0;
+  paused=false;
+  drawing=false;
+  musicStarted=false;
 
-  document.getElementById('bgMusic').pause();
-  document.getElementById('bgMusic').currentTime=0;
+  const music=document.getElementById('bgMusic');
+  music.pause();
+  music.currentTime=0;
 
   document.getElementById('resultsBody').innerHTML='';
   document.getElementById('progress').textContent='0';
   document.getElementById('resultFlash').style.display='none';
+
+  // ✅ reset wheels
+  document.getElementById('playerWheel').textContent='—';
+  document.getElementById('potAWheel').textContent='—';
+  document.getElementById('potBWheel').textContent='—';
 }
 </script>
 
