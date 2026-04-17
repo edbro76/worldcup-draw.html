@@ -6,29 +6,99 @@
 <title>Cerro Gordo World Cup Sweepstake Live Draw</title>
 
 <style>
-body{font-family:Arial;background:#2b2b2b;margin:0;padding:20px}
+body{
+  font-family:Arial;
+  background:#2b2b2b;
+  margin:0;
+  padding:20px;
+}
 .container{max-width:1200px;margin:auto}
 h1,h2{text-align:center;color:white}
 
-button{padding:12px 24px;margin:10px;border:none;border-radius:10px;cursor:pointer}
-.wheels{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.wheel{background:white;padding:30px;border-radius:20px;text-align:center}
+.controls{text-align:center;margin:20px}
+button{
+  padding:12px 24px;
+  margin:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.wheels{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+.wheel{
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+}
 .value{font-size:28px;font-weight:bold}
 
-table{width:100%;border-collapse:collapse;background:white}
-th,td{padding:10px;border:1px solid #ddd}
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+}
+th,td{
+  padding:10px;
+  border:1px solid #ddd;
+}
 
+/* RESULT FLASH */
 #resultFlash{
-display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);
-color:white;z-index:9999;justify-content:center;align-items:center;
-flex-direction:column;text-align:center;opacity:0;transition:1s;
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.95);
+  z-index:9999;
+  color:white;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+
+  text-align:center;
+  opacity:0;
+  transition:opacity 1s ease;
 }
 
-#countdownScreen{
-position:fixed;inset:0;background:#000;color:#ffd700;
-display:flex;flex-direction:column;justify-content:center;
-align-items:center;font-size:80px;z-index:10000;transition:1s;
+#flashPlayer{
+  font-size:150px;
+  color:#ffd700;
+  margin-bottom:40px;
 }
+
+.flashRow{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:20px;
+  font-size:90px;
+}
+
+.flashRow img{
+  height:90px;
+}
+
+/* COUNTDOWN */
+#countdownScreen{
+  position:fixed;
+  inset:0;
+  background:#000;
+  color:#ffd700;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:10000;
+  text-align:center;
+  transition:opacity 1s;
+}
+
 </style>
 </head>
 
@@ -37,7 +107,9 @@ align-items:center;font-size:80px;z-index:10000;transition:1s;
 <div class="container">
 <h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
 
+<div class="controls">
 <button onclick="drawNext()">Start Draw</button>
+</div>
 
 <div class="wheels">
 <div class="wheel"><div id="playerWheel" class="value">—</div></div>
@@ -51,19 +123,34 @@ align-items:center;font-size:80px;z-index:10000;transition:1s;
 <tbody id="resultsBody"></tbody>
 </table>
 
+<div style="text-align:center;">
 <button onclick="copyResults()">Copy</button>
 <button onclick="downloadPDF()">PDF</button>
 </div>
 
-<div id="countdownScreen">
-<div style="font-size:40px">Draw Starts In</div>
-<div id="countdownTimer"></div>
 </div>
 
+<!-- COUNTDOWN -->
+<div id="countdownScreen">
+<div style="font-size:50px;margin-bottom:20px;">Draw Starts In</div>
+<div id="countdownTimer" style="font-size:90px;"></div>
+</div>
+
+<!-- RESULT FLASH -->
 <div id="resultFlash">
-<div id="flashPlayer" style="font-size:120px;color:#ffd700"></div>
+
+<div id="flashPlayer"></div>
+
+<div class="flashRow">
+<img id="flagA">
 <div id="flashPotA"></div>
+</div>
+
+<div class="flashRow">
+<img id="flagB">
 <div id="flashPotB"></div>
+</div>
+
 </div>
 
 <audio id="bgMusic" loop>
@@ -74,9 +161,10 @@ align-items:center;font-size:80px;z-index:10000;transition:1s;
 
 <script>
 
-// TEST TIMER (change back later)
+// ⏱ TEST TIMER (change later)
 const drawDate = new Date(Date.now() + 10000);
 
+// DATA
 const playersSeed=['Audrey','Ed','Liz','Andy','Carys','Mike','Steve B','Mary','June','Ray','Ian M','Margaret M','Jean','Elaine','Trevor','Sheila','Dave','Roy 1','Roy 2','Maria','Gill','Len','Fiona','Craig'];
 
 const potASeed=['Argentina','Spain','France','England','Portugal','Brazil','Netherlands','Belgium','Germany','Croatia','Morocco','Colombia','Uruguay','Mexico','USA','Switzerland','Senegal','Japan','Iran','South Korea','Australia','Austria','Norway','Canada'];
@@ -86,20 +174,22 @@ const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arab
 let players=[...playersSeed], potA=[...potASeed], potB=[...potBSeed];
 let drawing=false, paused=false, count=0;
 
+const flags={Argentina:"ar",Spain:"es",France:"fr",England:"gb-eng",Portugal:"pt",Brazil:"br",Netherlands:"nl",Belgium:"be",Germany:"de",Croatia:"hr",Morocco:"ma",Colombia:"co",Uruguay:"uy",Mexico:"mx",USA:"us",Switzerland:"ch",Senegal:"sn",Japan:"jp",Iran:"ir","South Korea":"kr",Australia:"au",Austria:"at",Norway:"no",Canada:"ca",Paraguay:"py",Algeria:"dz",Egypt:"eg",Ghana:"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa",Qatar:"qa",Tunisia:"tn",Turkey:"tr","Czech Republic":"cz",Scotland:"gb-sct",Sweden:"se","South Africa":"za","New Zealand":"nz",Panama:"pa",Haiti:"ht","Curaçao":"cw","Cape Verde":"cv",Jordan:"jo",Uzbekistan:"uz",Iraq:"iq",Ecuador:"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"};
+
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
 
+// SPIN
 function spin(id,arr,val,cb){
 let t=0,el=document.getElementById(id);
 let i=setInterval(()=>{
 el.textContent=rand(arr);
-if(++t>20){clearInterval(i);el.textContent=val;cb();}
+if(++t>25){clearInterval(i);el.textContent=val;cb();}
 },100);
 }
 
+// DRAW
 function drawNext(){
 if(drawing||paused||!players.length)return;
-
-document.getElementById('resultFlash').style.display='none';
 
 drawing=true;
 
@@ -117,12 +207,17 @@ count++;
 resultsBody.innerHTML+=`<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`;
 progress.textContent=count;
 
+// FLASH
 flashPlayer.textContent=p;
 flashPotA.textContent=a;
 flashPotB.textContent=b;
 
+flagA.src=`https://flagcdn.com/w80/${flags[a]}.png`;
+flagB.src=`https://flagcdn.com/w80/${flags[b]}.png`;
+
 let f=resultFlash;
-f.style.display='flex';setTimeout(()=>f.style.opacity=1,50);
+f.style.display='flex';
+setTimeout(()=>f.style.opacity=1,50);
 
 drawing=false;
 
@@ -130,22 +225,20 @@ setTimeout(()=>{
 f.style.opacity=0;
 setTimeout(()=>{
 f.style.display='none';
-if(players.length)drawNext();
-},1000);
-},2000);
+if(players.length) drawNext();
+},800);
+},3000);
 
 });
 });
 });
 }
 
-// RIGHT CLICK PAUSE
+// PAUSE
 document.addEventListener('contextmenu',e=>{
 e.preventDefault();
 if(drawing)return;
-
 paused=!paused;
-
 if(!paused && players.length) drawNext();
 });
 
@@ -175,17 +268,15 @@ let c=r.children;
 doc.text(`${c[0].innerText}. ${c[1].innerText} - ${c[2].innerText}/${c[3].innerText}`,10,y);
 y+=8;
 });
-
 doc.save("draw.pdf");
 }
 
-// COUNTDOWN
+// COUNTDOWN (NO AUTO START)
 setInterval(()=>{
 let diff=drawDate-new Date();
 if(diff<=0){
-countdownScreen.style.display="none";
-document.getElementById("bgMusic").play();
-drawNext();
+countdownScreen.style.opacity=0;
+setTimeout(()=>countdownScreen.style.display="none",1000);
 return;
 }
 let s=Math.floor(diff/1000)%60;
