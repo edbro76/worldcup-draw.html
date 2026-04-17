@@ -311,6 +311,48 @@ function copyResults(){
     alert("Results copied!");
   });
 }
+  // SET YOUR DRAW DATE
+const drawDate = new Date("2026-05-24T19:00:00");
+
+function updateCountdown(){
+  const now = new Date();
+  const diff = drawDate - now;
+
+  const screen = document.getElementById('countdownScreen');
+  const timer = document.getElementById('countdownTimer');
+
+  if(diff <= 0){
+    screen.style.opacity='0';
+
+    setTimeout(()=>{
+      timer.innerHTML = "DRAW WILL START IN 1 MIN";
+      screen.style.opacity='1';
+
+      setTimeout(()=>{
+        screen.style.opacity='0';
+        setTimeout(()=>{
+          screen.style.display='none';
+        },1000);
+      },3000);
+
+    },1000);
+
+    clearInterval(countdownInterval);
+    return;
+  }
+
+  const days = Math.floor(diff / (1000*60*60*24));
+  const hours = Math.floor((diff / (1000*60*60)) % 24);
+  const mins = Math.floor((diff / (1000*60)) % 60);
+  const secs = Math.floor((diff / 1000) % 60);
+
+  timer.innerHTML = `
+    ${days}d ${hours}h ${mins}m ${secs}s
+  `;
+}
+
+const countdownInterval = setInterval(updateCountdown,1000);
+updateCountdown();
 </script>
 
 </body>
