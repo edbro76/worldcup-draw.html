@@ -6,86 +6,28 @@
 <title>Cerro Gordo World Cup Sweepstake Live Draw</title>
 
 <style>
-body{
-  font-family:Arial,sans-serif;
-  background:#2b2b2b;
-  margin:0;
-  padding:20px;
-}
+body{font-family:Arial;background:#2b2b2b;margin:0;padding:20px}
 .container{max-width:1200px;margin:auto}
 h1,h2{text-align:center;color:white}
 
-.controls{text-align:center;margin:20px 0}
-button{
-  padding:12px 24px;
-  margin:10px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  font-size:16px;
-}
-#drawBtn{background:#1d4ed8;color:white}
+button{padding:12px 24px;margin:10px;border:none;border-radius:10px;cursor:pointer}
+.wheels{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.wheel{background:white;padding:30px;border-radius:20px;text-align:center}
+.value{font-size:28px;font-weight:bold}
 
-.wheels{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px;
-  margin:20px 0;
-}
-.wheel{
-  background:white;
-  padding:30px;
-  border-radius:20px;
-  text-align:center;
-}
-.value{font-size:28px;font-weight:bold;color:#0b3a75}
+table{width:100%;border-collapse:collapse;background:white}
+th,td{padding:10px;border:1px solid #ddd}
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  background:white;
-}
-th,td{
-  padding:10px;
-  border:1px solid #ddd;
-}
-
-/* FLASH */
 #resultFlash{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.9);
-  color:white;
-  z-index:9999;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  text-align:center;
-  opacity:0;
-  transition:opacity 1s ease;
+display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);
+color:white;z-index:9999;justify-content:center;align-items:center;
+flex-direction:column;text-align:center;opacity:0;transition:1s;
 }
 
-/* COUNTDOWN */
 #countdownScreen{
-  position:fixed;
-  inset:0;
-  background:#000;
-  color:#ffd700;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  z-index:10000;
-  text-align:center;
-}
-
-.fade{
-  opacity:0;
-  transition:opacity 1.5s ease;
-}
-.show{
-  opacity:1;
+position:fixed;inset:0;background:#000;color:#ffd700;
+display:flex;flex-direction:column;justify-content:center;
+align-items:center;font-size:80px;z-index:10000;transition:1s;
 }
 </style>
 </head>
@@ -95,130 +37,163 @@ th,td{
 <div class="container">
 <h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
 
-<div class="controls">
 <button onclick="drawNext()">Start Draw</button>
-</div>
 
 <div class="wheels">
-<div class="wheel"><h3>Player</h3><div id="playerWheel" class="value">—</div></div>
-<div class="wheel"><h3>Pot A</h3><div id="potAWheel" class="value">—</div></div>
-<div class="wheel"><h3>Pot B</h3><div id="potBWheel" class="value">—</div></div>
+<div class="wheel"><div id="playerWheel" class="value">—</div></div>
+<div class="wheel"><div id="potAWheel" class="value">—</div></div>
+<div class="wheel"><div id="potBWheel" class="value">—</div></div>
 </div>
 
-<h2>Draw Table (<span id="progress">0</span>/24)</h2>
+<h2><span id="progress">0</span>/24</h2>
 
 <table>
-<thead><tr><th>#</th><th>Player</th><th>Pot A</th><th>Pot B</th></tr></thead>
 <tbody id="resultsBody"></tbody>
 </table>
 
-<div style="text-align:center;margin-top:20px;">
-<button onclick="copyResults()">Copy Results</button>
-<button onclick="downloadPDF()">Download PDF</button>
+<button onclick="copyResults()">Copy</button>
+<button onclick="downloadPDF()">PDF</button>
 </div>
 
-</div>
-
-<!-- COUNTDOWN -->
 <div id="countdownScreen">
-
-  <div id="countdownTitle" class="fade" style="font-size:60px;margin-bottom:20px;letter-spacing:3px;">
-    Draw Starts In
-  </div>
-
-  <div id="countdownTimer" class="fade" style="font-size:90px;"></div>
-
+<div style="font-size:40px">Draw Starts In</div>
+<div id="countdownTimer"></div>
 </div>
 
-<!-- FLASH -->
 <div id="resultFlash">
-  <div id="flashPlayer" style="font-size:160px;color:#ffd700;"></div>
-
-  <div style="display:flex;align-items:center;gap:20px;">
-    <img id="flagA" style="height:80px;">
-    <div id="flashPotA" style="font-size:110px;"></div>
-  </div>
-
-  <div style="display:flex;align-items:center;gap:20px;">
-    <img id="flagB" style="height:80px;">
-    <div id="flashPotB" style="font-size:110px;"></div>
-  </div>
+<div id="flashPlayer" style="font-size:120px;color:#ffd700"></div>
+<div id="flashPotA"></div>
+<div id="flashPotB"></div>
 </div>
 
 <audio id="bgMusic" loop>
-  <source src="themetune.mp3" type="audio/mpeg">
+<source src="themetune.mp3">
 </audio>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 
-// DATE
+// TEST TIMER (change back later)
 const drawDate = new Date(Date.now() + 10000);
 
-// INTRO FADE
-window.onload = ()=>{
-  setTimeout(()=>document.getElementById('countdownTitle').classList.add('show'),500);
-  setTimeout(()=>document.getElementById('countdownTimer').classList.add('show'),1500);
-};
-
-// COUNTDOWN
-function updateCountdown(){
-  const now = new Date();
-  const diff = drawDate - now;
-
-  const screen = document.getElementById('countdownScreen');
-  const timer = document.getElementById('countdownTimer');
-
-  if(diff <= 0){
-    screen.style.opacity='0';
-
-    setTimeout(()=>{
-      timer.innerHTML = "DRAW WILL START IN 1 MIN";
-      screen.style.opacity='1';
-
-      const music = document.getElementById('bgMusic');
-      music.play().catch(()=>{});
-      musicStarted = true;
-
-      setTimeout(()=>{
-        screen.style.opacity='0';
-        setTimeout(()=>{
-          screen.style.display='none';
-          drawNext();
-        },1000);
-      },3000);
-
-    },1000);
-
-    clearInterval(countdownInterval);
-    return;
-  }
-
-  const d=Math.floor(diff/86400000);
-  const h=Math.floor(diff/3600000)%24;
-  const m=Math.floor(diff/60000)%60;
-  const s=Math.floor(diff/1000)%60;
-
-  timer.innerHTML=`${d}d ${h}h ${m}m ${s}s`;
-}
-
-const countdownInterval=setInterval(updateCountdown,1000);
-updateCountdown();
-
-// DATA (same as before)
 const playersSeed=['Audrey','Ed','Liz','Andy','Carys','Mike','Steve B','Mary','June','Ray','Ian M','Margaret M','Jean','Elaine','Trevor','Sheila','Dave','Roy 1','Roy 2','Maria','Gill','Len','Fiona','Craig'];
+
 const potASeed=['Argentina','Spain','France','England','Portugal','Brazil','Netherlands','Belgium','Germany','Croatia','Morocco','Colombia','Uruguay','Mexico','USA','Switzerland','Senegal','Japan','Iran','South Korea','Australia','Austria','Norway','Canada'];
+
 const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arabia','Qatar','Tunisia','Turkey','Czech Republic','Scotland','Sweden','South Africa','New Zealand','Panama','Haiti','Curaçao','Cape Verde','Jordan','Uzbekistan','Iraq','Ecuador','DR Congo','Bosnia & Herzegovina'];
 
 let players=[...playersSeed], potA=[...potASeed], potB=[...potBSeed];
-let count=0, drawing=false, paused=false, musicStarted=false;
+let drawing=false, paused=false, count=0;
 
-const flags={ "Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng","Portugal":"pt","Brazil":"br","Netherlands":"nl","Belgium":"be","Germany":"de","Croatia":"hr","Morocco":"ma","Colombia":"co","Uruguay":"uy","Mexico":"mx","USA":"us","Switzerland":"ch","Senegal":"sn","Japan":"jp","Iran":"ir","South Korea":"kr","Australia":"au","Austria":"at","Norway":"no","Canada":"ca","Paraguay":"py","Algeria":"dz","Egypt":"eg","Ghana":"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa","Qatar":"qa","Tunisia":"tn","Turkey":"tr","Czech Republic":"cz","Scotland":"gb-sct","Sweden":"se","South Africa":"za","New Zealand":"nz","Panama":"pa","Haiti":"ht","Curaçao":"cw","Cape Verde":"cv","Jordan":"jo","Uzbekistan":"uz","Iraq":"iq","Ecuador":"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba" };
+function rand(a){return a[Math.floor(Math.random()*a.length)]}
 
-function randomItem(a){return a[Math.floor(Math.random()*a.length)]}
+function spin(id,arr,val,cb){
+let t=0,el=document.getElementById(id);
+let i=setInterval(()=>{
+el.textContent=rand(arr);
+if(++t>20){clearInterval(i);el.textContent=val;cb();}
+},100);
+}
 
-// (draw logic unchanged — already working perfectly)
+function drawNext(){
+if(drawing||paused||!players.length)return;
+
+document.getElementById('resultFlash').style.display='none';
+
+drawing=true;
+
+let p=rand(players),a=rand(potA),b=rand(potB);
+
+spin('playerWheel',players,p,()=>{
+spin('potAWheel',potA,a,()=>{
+spin('potBWheel',potB,b,()=>{
+
+players=players.filter(x=>x!==p);
+potA=potA.filter(x=>x!==a);
+potB=potB.filter(x=>x!==b);
+count++;
+
+resultsBody.innerHTML+=`<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`;
+progress.textContent=count;
+
+flashPlayer.textContent=p;
+flashPotA.textContent=a;
+flashPotB.textContent=b;
+
+let f=resultFlash;
+f.style.display='flex';setTimeout(()=>f.style.opacity=1,50);
+
+drawing=false;
+
+setTimeout(()=>{
+f.style.opacity=0;
+setTimeout(()=>{
+f.style.display='none';
+if(players.length)drawNext();
+},1000);
+},2000);
+
+});
+});
+});
+}
+
+// RIGHT CLICK PAUSE
+document.addEventListener('contextmenu',e=>{
+e.preventDefault();
+if(drawing)return;
+
+paused=!paused;
+
+if(!paused && players.length) drawNext();
+});
+
+// RESET
+document.addEventListener('keydown',e=>{
+if(e.key==="r"){location.reload();}
+});
+
+// COPY
+function copyResults(){
+let t="";
+document.querySelectorAll("#resultsBody tr").forEach(r=>{
+let c=r.children;
+t+=`${c[0].innerText}. ${c[1].innerText} - ${c[2].innerText}/${c[3].innerText}\n`;
+});
+navigator.clipboard.writeText(t);
+}
+
+// PDF
+function downloadPDF(){
+const {jsPDF}=window.jspdf;
+let doc=new jsPDF();
+let y=20;
+
+document.querySelectorAll("#resultsBody tr").forEach(r=>{
+let c=r.children;
+doc.text(`${c[0].innerText}. ${c[1].innerText} - ${c[2].innerText}/${c[3].innerText}`,10,y);
+y+=8;
+});
+
+doc.save("draw.pdf");
+}
+
+// COUNTDOWN
+setInterval(()=>{
+let diff=drawDate-new Date();
+if(diff<=0){
+countdownScreen.style.display="none";
+document.getElementById("bgMusic").play();
+drawNext();
+return;
+}
+let s=Math.floor(diff/1000)%60;
+let m=Math.floor(diff/60000)%60;
+let h=Math.floor(diff/3600000)%24;
+let d=Math.floor(diff/86400000);
+countdownTimer.textContent=`${d}d ${h}h ${m}m ${s}s`;
+},1000);
 
 </script>
 
