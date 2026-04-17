@@ -65,6 +65,8 @@ th,td{
   text-align:center;
 }
 </style>
+  opacity:0;
+transition:opacity 1s ease;
 </head>
 
 <body>
@@ -92,7 +94,7 @@ th,td{
 </div>
 
 <!-- RESULT FLASH -->
-<div id="resultFlash" onclick="drawNext()">
+<div id="resultFlash">
 
   <div id="flashPlayer" style="font-size:160px;color:#ffd700;"></div>
 
@@ -183,9 +185,28 @@ function drawNext(){
         document.getElementById('flagA').src=`https://flagcdn.com/w80/${flags[a]}.png`;
         document.getElementById('flagB').src=`https://flagcdn.com/w80/${flags[b]}.png`;
 
-        document.getElementById('resultFlash').style.display='flex';
+        const flash=document.getElementById('resultFlash');
+flash.style.display='flex';
+setTimeout(()=>{flash.style.opacity='1';},50);
 
         drawing=false;
+
+// ⏱️ hold result for 3 seconds then continue
+setTimeout(()=>{
+  document.getElementById('resultFlash').style.opacity='0';
+
+  setTimeout(()=>{
+    document.getElementById('resultFlash').style.display='none';
+
+    if(players.length>0){
+      drawNext(); // 🔁 automatic next draw
+    }else{
+      showComplete(); // 🎉 finished
+    }
+
+  },1000); // wait for fade out
+
+},3000);
       });
     });
   });
@@ -235,6 +256,16 @@ function resetAll(){
     document.getElementById('potAWheel').innerHTML='—';
     document.getElementById('potBWheel').innerHTML='—';
   },10);
+}
+  function showComplete(){
+  const flash=document.getElementById('resultFlash');
+
+  document.getElementById('flashPlayer').textContent='🏆 DRAW COMPLETE';
+  document.getElementById('flashPotA').textContent='';
+  document.getElementById('flashPotB').textContent='';
+
+  flash.style.display='flex';
+  flash.style.opacity='1';
 }
 </script>
 
