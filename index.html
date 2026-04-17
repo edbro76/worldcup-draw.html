@@ -25,7 +25,6 @@ button{
   font-size:16px;
 }
 #drawBtn{background:#1d4ed8;color:white}
-#resetBtn{background:#ddd}
 
 .wheels{
   display:grid;
@@ -37,7 +36,6 @@ button{
   background:white;
   padding:30px;
   border-radius:20px;
-  box-shadow:0 4px 10px rgba(0,0,0,.2);
   text-align:center;
 }
 .value{font-size:28px;font-weight:bold;color:#0b3a75}
@@ -52,6 +50,7 @@ th,td{
   border:1px solid #ddd;
 }
 
+/* FLASH SCREEN */
 #resultFlash{
   display:none;
   position:fixed;
@@ -63,10 +62,11 @@ th,td{
   align-items:center;
   flex-direction:column;
   text-align:center;
+
+  opacity:0;
+  transition:opacity 1s ease;
 }
 </style>
-  opacity:0;
-transition:opacity 1s ease;
 </head>
 
 <body>
@@ -75,8 +75,7 @@ transition:opacity 1s ease;
 <h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
 
 <div class="controls">
-<button onclick="drawNext()">Draw Next</button>
-<button onclick="resetAll()">Reset</button>
+<button onclick="drawNext()">Start Draw</button>
 </div>
 
 <div class="wheels">
@@ -93,7 +92,7 @@ transition:opacity 1s ease;
 </table>
 </div>
 
-<!-- RESULT FLASH -->
+<!-- FLASH -->
 <div id="resultFlash">
 
   <div id="flashPlayer" style="font-size:160px;color:#ffd700;"></div>
@@ -116,6 +115,7 @@ transition:opacity 1s ease;
 
 <script>
 
+// DATA
 const playersSeed=['Audrey','Ed','Liz','Andy','Carys','Mike','Steve B','Mary','June','Ray','Ian M','Margaret M','Jean','Elaine','Trevor','Sheila','Dave','Roy 1','Roy 2','Maria','Gill','Len','Fiona','Craig'];
 
 const potASeed=['Argentina','Spain','France','England','Portugal','Brazil','Netherlands','Belgium','Germany','Croatia','Morocco','Colombia','Uruguay','Mexico','USA','Switzerland','Senegal','Japan','Iran','South Korea','Australia','Austria','Norway','Canada'];
@@ -125,6 +125,7 @@ const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arab
 let players=[...playersSeed], potA=[...potASeed], potB=[...potBSeed];
 let count=0, drawing=false, paused=false, musicStarted=false;
 
+// FLAGS
 const flags={
  "Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng","Portugal":"pt","Brazil":"br",
  "Netherlands":"nl","Belgium":"be","Germany":"de","Croatia":"hr","Morocco":"ma","Colombia":"co",
@@ -138,6 +139,7 @@ const flags={
 
 function randomItem(a){return a[Math.floor(Math.random()*a.length)]}
 
+// SPIN
 function spin(id, arr, finalValue, cb){
   let t=0, el=document.getElementById(id);
   let i=setInterval(()=>{
@@ -150,12 +152,11 @@ function spin(id, arr, finalValue, cb){
   },100);
 }
 
+// DRAW LOOP
 function drawNext(){
-  if(paused || drawing) return;
+  if(paused || drawing || !players.length) return;
 
   document.getElementById('resultFlash').style.display='none';
-  if(!players.length) return;
-
   ['playerWheel','potAWheel','potBWheel'].forEach(id=>document.getElementById(id).textContent='—');
 
   let music=document.getElementById('bgMusic');
@@ -168,6 +169,7 @@ function drawNext(){
   spin('playerWheel',players,p,()=>{
     spin('potAWheel',potA,a,()=>{
       spin('potBWheel',potB,b,()=>{
+
         players=players.filter(x=>x!==p);
         potA=potA.filter(x=>x!==a);
         potB=potB.filter(x=>x!==b);
@@ -178,6 +180,7 @@ function drawNext(){
 
         document.getElementById('progress').textContent=count;
 
+        // FLASH CONTENT
         document.getElementById('flashPlayer').textContent=p;
         document.getElementById('flashPotA').textContent=a;
         document.getElementById('flashPotB').textContent=b;
@@ -185,48 +188,67 @@ function drawNext(){
         document.getElementById('flagA').src=`https://flagcdn.com/w80/${flags[a]}.png`;
         document.getElementById('flagB').src=`https://flagcdn.com/w80/${flags[b]}.png`;
 
+        // FADE IN
         const flash=document.getElementById('resultFlash');
-flash.style.display='flex';
-setTimeout(()=>{flash.style.opacity='1';},50);
+        flash.style.display='flex';
+        setTimeout(()=>{flash.style.opacity='1';},50);
 
         drawing=false;
 
-// ⏱️ hold result for 3 seconds then continue
-setTimeout(()=>{
-  document.getElementById('resultFlash').style.opacity='0';
+        // AUTO CONTINUE
+        setTimeout(()=>{
+          flash.style.opacity='0';
 
-  setTimeout(()=>{
-    document.getElementById('resultFlash').style.display='none';
+          setTimeout(()=>{
+            flash.style.display='none';
 
-    if(players.length>0){
-      drawNext(); // 🔁 automatic next draw
-    }else{
-      showComplete(); // 🎉 finished
-    }
+            if(players.length>0){
+              drawNext();
+            }else{
+              showComplete();
+            }
 
-  },1000); // wait for fade out
+          },1000);
 
-},3000);
+        },3000);
+
       });
     });
   });
 }
 
+// COMPLETE
+function showComplete(){
+  const flash=document.getElementById('resultFlash');
+  document.getElementById('flashPlayer').textContent='🏆 DRAW COMPLETE';
+  document.getElementById('flashPotA').textContent='';
+  document.getElementById('flashPotB').textContent='';
+  flash.style.display='flex';
+  flash.style.opacity='1';
+
+  // clear wheels
+  document.getElementById('playerWheel').textContent='—';
+  document.getElementById('potAWheel').textContent='—';
+  document.getElementById('potBWheel').textContent='—';
+}
+
+// PAUSE
 document.addEventListener('contextmenu', e=>{
   e.preventDefault();
   if(drawing) return;
   paused=!paused;
 
   if(paused){
+    const flash=document.getElementById('resultFlash');
     document.getElementById('flashPlayer').textContent='⏸ PAUSED';
     document.getElementById('flashPotA').textContent='Right click to resume';
     document.getElementById('flashPotB').textContent='';
-    document.getElementById('resultFlash').style.display='flex';
-  }else{
-    document.getElementById('resultFlash').style.display='none';
+    flash.style.display='flex';
+    flash.style.opacity='1';
   }
 });
 
+// RESET
 document.addEventListener('keydown', e=>{
   if(e.key.toLowerCase()==='r'){
     if(confirm('Reset draw?')) resetAll();
@@ -242,7 +264,7 @@ function resetAll(){
   drawing=false;
   musicStarted=false;
 
-  const music=document.getElementById('bgMusic');
+  let music=document.getElementById('bgMusic');
   music.pause();
   music.currentTime=0;
 
@@ -250,23 +272,13 @@ function resetAll(){
   document.getElementById('progress').textContent='0';
   document.getElementById('resultFlash').style.display='none';
 
-  // 🔥 FORCE clear wheels (important)
   setTimeout(()=>{
-    document.getElementById('playerWheel').innerHTML='—';
-    document.getElementById('potAWheel').innerHTML='—';
-    document.getElementById('potBWheel').innerHTML='—';
+    document.getElementById('playerWheel').textContent='—';
+    document.getElementById('potAWheel').textContent='—';
+    document.getElementById('potBWheel').textContent='—';
   },10);
 }
-  function showComplete(){
-  const flash=document.getElementById('resultFlash');
 
-  document.getElementById('flashPlayer').textContent='🏆 DRAW COMPLETE';
-  document.getElementById('flashPotA').textContent='';
-  document.getElementById('flashPotB').textContent='';
-
-  flash.style.display='flex';
-  flash.style.opacity='1';
-}
 </script>
 
 </body>
