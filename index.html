@@ -31,11 +31,16 @@ button{
 }
 .wheel{
   background:white;
-  padding:30px;
+  padding:25px 40px;
   border-radius:20px;
   text-align:center;
+  min-width:220px;
 }
-.value{font-size:28px;font-weight:bold}
+}
+.value{
+  font-size:30px;
+  font-weight:bold;
+}
 
 table{
   width:100%;
@@ -108,13 +113,29 @@ th,td{
 <h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
 
 <div class="controls">
-<button onclick="drawNext()">Start Draw</button>
+  <button onclick="drawNext()">Start Draw</button>
+</div>
+
+<div class="controls">
+  <button onclick="copyResults()">Copy</button>
+  <button onclick="downloadPDF()">PDF</button>
 </div>
 
 <div class="wheels">
-<div class="wheel"><div id="playerWheel" class="value">—</div></div>
-<div class="wheel"><div id="potAWheel" class="value">—</div></div>
-<div class="wheel"><div id="potBWheel" class="value">—</div></div>
+  <div class="wheel">
+    <div style="font-size:14px;color:#666;margin-bottom:5px;">Player</div>
+    <div id="playerWheel" class="value">—</div>
+  </div>
+
+  <div class="wheel">
+    <div style="font-size:14px;color:#666;margin-bottom:5px;">Pot A</div>
+    <div id="potAWheel" class="value">—</div>
+  </div>
+
+  <div class="wheel">
+    <div style="font-size:14px;color:#666;margin-bottom:5px;">Pot B</div>
+    <div id="potBWheel" class="value">—</div>
+  </div>
 </div>
 
 <h2><span id="progress">0</span>/24</h2>
@@ -221,13 +242,28 @@ setTimeout(()=>f.style.opacity=1,50);
 
 drawing=false;
 
+// Fade IN
+let f=resultFlash;
+f.style.display='flex';
+setTimeout(()=>f.style.opacity=1,50);
+
+drawing=false;
+
+// ⏱️ Stay visible for 3 seconds AFTER fade in
 setTimeout(()=>{
-f.style.opacity=0;
-setTimeout(()=>{
-f.style.display='none';
-if(players.length) drawNext();
-},800);
-},3000);
+  // Fade OUT
+  f.style.opacity=0;
+
+  setTimeout(()=>{
+    f.style.display='none';
+
+    if(players.length && !paused){
+      drawNext();
+    }
+
+  },1000); // fade-out duration
+
+},3000); // full visible time
 
 });
 });
