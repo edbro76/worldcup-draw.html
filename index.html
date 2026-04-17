@@ -15,6 +15,21 @@ body{
   max-width:1200px;
   margin:auto;
 }
+ const flags = {
+  "Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng",
+  "Portugal":"pt","Brazil":"br","Netherlands":"nl","Belgium":"be",
+  "Germany":"de","Croatia":"hr","Morocco":"ma","Colombia":"co",
+  "Uruguay":"uy","Mexico":"mx","USA":"us","Switzerland":"ch",
+  "Senegal":"sn","Japan":"jp","Iran":"ir","South Korea":"kr",
+  "Australia":"au","Austria":"at","Norway":"no","Canada":"ca",
+
+  "Paraguay":"py","Algeria":"dz","Egypt":"eg","Ghana":"gh",
+  "Cote d'Ivoire":"ci","Saudi Arabia":"sa","Qatar":"qa","Tunisia":"tn",
+  "Turkey":"tr","Czech Republic":"cz","Scotland":"gb-sct","Sweden":"se",
+  "South Africa":"za","New Zealand":"nz","Panama":"pa","Haiti":"ht",
+  "Curaçao":"cw","Cape Verde":"cv","Jordan":"jo","Uzbekistan":"uz",
+  "Iraq":"iq","Ecuador":"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"
+};
 h1,h2{
   text-align:center;
   color:white;
@@ -107,8 +122,16 @@ th,td{
 
 <div id="resultFlash" onclick="drawNext()">
   <div id="flashPlayer" style="font-size:160px;color:#ffd700;"></div>
-  <div id="flashPotA" style="font-size:110px;color:white;"></div>
-  <div id="flashPotB" style="font-size:110px;color:white;"></div>
+
+  <div style="display:flex;align-items:center;justify-content:center;gap:20px;">
+    <img id="flagA" style="height:80px;">
+    <div id="flashPotA" style="font-size:110px;color:white;"></div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:center;gap:20px;">
+    <img id="flagB" style="height:80px;">
+    <div id="flashPotB" style="font-size:110px;color:white;"></div>
+  </div>
 </div>
 
 <audio id="bgMusic" loop>
@@ -157,9 +180,12 @@ function drawNext(){
 
   if(!players.length) return;
 
-  document.getElementById('playerWheel').textContent='—';
-  document.getElementById('potAWheel').textContent='—';
-  document.getElementById('potBWheel').textContent='—';
+  document.getElementById('flashPlayer').textContent=selectedPlayer;
+document.getElementById('flashPotA').textContent=selectedA;
+document.getElementById('flashPotB').textContent=selectedB;
+
+document.getElementById('flagA').src = "https://flagcdn.com/w80/" + flags[selectedA] + ".png";
+document.getElementById('flagB').src = "https://flagcdn.com/w80/" + flags[selectedB] + ".png";
 
   const music=document.getElementById('bgMusic');
   if(!musicStarted){
