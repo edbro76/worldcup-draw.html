@@ -90,6 +90,9 @@ th,td{
 <thead><tr><th>#</th><th>Player</th><th>Pot A</th><th>Pot B</th></tr></thead>
 <tbody id="resultsBody"></tbody>
 </table>
+  <div style="text-align:center;margin-top:20px;">
+  <button onclick="copyResults()">Copy Results</button>
+</div>
 </div>
 
 <!-- FLASH -->
@@ -220,9 +223,11 @@ function drawNext(){
 // COMPLETE
 function showComplete(){
   const flash=document.getElementById('resultFlash');
+
   document.getElementById('flashPlayer').textContent='🏆 DRAW COMPLETE';
-  document.getElementById('flashPotA').textContent='';
+  document.getElementById('flashPotA').textContent='Click to continue';
   document.getElementById('flashPotB').textContent='';
+
   flash.style.display='flex';
   flash.style.opacity='1';
 
@@ -230,6 +235,14 @@ function showComplete(){
   document.getElementById('playerWheel').textContent='—';
   document.getElementById('potAWheel').textContent='—';
   document.getElementById('potBWheel').textContent='—';
+
+  // 👇 allow exit
+  flash.onclick = () => {
+    flash.style.opacity='0';
+    setTimeout(()=>{
+      flash.style.display='none';
+    },500);
+  };
 }
 
 // PAUSE
@@ -278,7 +291,19 @@ function resetAll(){
     document.getElementById('potBWheel').textContent='—';
   },10);
 }
+function copyResults(){
+  let rows=document.querySelectorAll('#resultsBody tr');
+  let text="Cerro Gordo World Cup Sweepstake Results\n\n";
 
+  rows.forEach(row=>{
+    let cols=row.querySelectorAll('td');
+    text += `${cols[0].innerText}. ${cols[1].innerText} - ${cols[2].innerText} / ${cols[3].innerText}\n`;
+  });
+
+  navigator.clipboard.writeText(text).then(()=>{
+    alert("Results copied to clipboard!");
+  });
+}
 </script>
 
 </body>
