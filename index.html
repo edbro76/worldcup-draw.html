@@ -18,7 +18,7 @@ h1,h2{text-align:center;color:white}
 .controls{text-align:center;margin:20px 0}
 button{
   padding:12px 24px;
-  margin:0 10px;
+  margin:10px;
   border:none;
   border-radius:10px;
   cursor:pointer;
@@ -50,7 +50,7 @@ th,td{
   border:1px solid #ddd;
 }
 
-/* FLASH SCREEN */
+/* FLASH */
 #resultFlash{
   display:none;
   position:fixed;
@@ -62,7 +62,6 @@ th,td{
   align-items:center;
   flex-direction:column;
   text-align:center;
-
   opacity:0;
   transition:opacity 1s ease;
 }
@@ -90,9 +89,11 @@ th,td{
 <thead><tr><th>#</th><th>Player</th><th>Pot A</th><th>Pot B</th></tr></thead>
 <tbody id="resultsBody"></tbody>
 </table>
-  <div style="text-align:center;margin-top:20px;">
-  <button onclick="copyResults()">Copy Results</button>
+
+<div style="text-align:center;margin-top:20px;">
+<button onclick="copyResults()">Copy Results</button>
 </div>
+
 </div>
 
 <!-- FLASH -->
@@ -129,16 +130,7 @@ let players=[...playersSeed], potA=[...potASeed], potB=[...potBSeed];
 let count=0, drawing=false, paused=false, musicStarted=false;
 
 // FLAGS
-const flags={
- "Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng","Portugal":"pt","Brazil":"br",
- "Netherlands":"nl","Belgium":"be","Germany":"de","Croatia":"hr","Morocco":"ma","Colombia":"co",
- "Uruguay":"uy","Mexico":"mx","USA":"us","Switzerland":"ch","Senegal":"sn","Japan":"jp",
- "Iran":"ir","South Korea":"kr","Australia":"au","Austria":"at","Norway":"no","Canada":"ca",
- "Paraguay":"py","Algeria":"dz","Egypt":"eg","Ghana":"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa",
- "Qatar":"qa","Tunisia":"tn","Turkey":"tr","Czech Republic":"cz","Scotland":"gb-sct","Sweden":"se",
- "South Africa":"za","New Zealand":"nz","Panama":"pa","Haiti":"ht","Curaçao":"cw","Cape Verde":"cv",
- "Jordan":"jo","Uzbekistan":"uz","Iraq":"iq","Ecuador":"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"
-};
+const flags={ "Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng","Portugal":"pt","Brazil":"br","Netherlands":"nl","Belgium":"be","Germany":"de","Croatia":"hr","Morocco":"ma","Colombia":"co","Uruguay":"uy","Mexico":"mx","USA":"us","Switzerland":"ch","Senegal":"sn","Japan":"jp","Iran":"ir","South Korea":"kr","Australia":"au","Austria":"at","Norway":"no","Canada":"ca","Paraguay":"py","Algeria":"dz","Egypt":"eg","Ghana":"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa","Qatar":"qa","Tunisia":"tn","Turkey":"tr","Czech Republic":"cz","Scotland":"gb-sct","Sweden":"se","South Africa":"za","New Zealand":"nz","Panama":"pa","Haiti":"ht","Curaçao":"cw","Cape Verde":"cv","Jordan":"jo","Uzbekistan":"uz","Iraq":"iq","Ecuador":"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba" };
 
 function randomItem(a){return a[Math.floor(Math.random()*a.length)]}
 
@@ -155,11 +147,12 @@ function spin(id, arr, finalValue, cb){
   },100);
 }
 
-// DRAW LOOP
+// DRAW
 function drawNext(){
   if(paused || drawing || !players.length) return;
 
   document.getElementById('resultFlash').style.display='none';
+
   ['playerWheel','potAWheel','potBWheel'].forEach(id=>document.getElementById(id).textContent='—');
 
   let music=document.getElementById('bgMusic');
@@ -183,7 +176,6 @@ function drawNext(){
 
         document.getElementById('progress').textContent=count;
 
-        // FLASH CONTENT
         document.getElementById('flashPlayer').textContent=p;
         document.getElementById('flashPotA').textContent=a;
         document.getElementById('flashPotB').textContent=b;
@@ -191,28 +183,22 @@ function drawNext(){
         document.getElementById('flagA').src=`https://flagcdn.com/w80/${flags[a]}.png`;
         document.getElementById('flagB').src=`https://flagcdn.com/w80/${flags[b]}.png`;
 
-        // FADE IN
         const flash=document.getElementById('resultFlash');
         flash.style.display='flex';
-        setTimeout(()=>{flash.style.opacity='1';},50);
+        setTimeout(()=>flash.style.opacity='1',50);
 
         drawing=false;
 
-        // AUTO CONTINUE
         setTimeout(()=>{
           flash.style.opacity='0';
-
           setTimeout(()=>{
             flash.style.display='none';
-
             if(players.length>0){
               drawNext();
             }else{
               showComplete();
             }
-
           },1000);
-
         },3000);
 
       });
@@ -231,33 +217,38 @@ function showComplete(){
   flash.style.display='flex';
   flash.style.opacity='1';
 
-  // clear wheels
+  flash.onclick=()=>{
+    flash.style.opacity='0';
+    setTimeout(()=>flash.style.display='none',500);
+  };
+
   document.getElementById('playerWheel').textContent='—';
   document.getElementById('potAWheel').textContent='—';
   document.getElementById('potBWheel').textContent='—';
-
-  // 👇 allow exit
-  flash.onclick = () => {
-    flash.style.opacity='0';
-    setTimeout(()=>{
-      flash.style.display='none';
-    },500);
-  };
 }
 
-// PAUSE
+// PAUSE / RESUME
 document.addEventListener('contextmenu', e=>{
   e.preventDefault();
   if(drawing) return;
+
   paused=!paused;
+  const flash=document.getElementById('resultFlash');
 
   if(paused){
-    const flash=document.getElementById('resultFlash');
     document.getElementById('flashPlayer').textContent='⏸ PAUSED';
     document.getElementById('flashPotA').textContent='Right click to resume';
     document.getElementById('flashPotB').textContent='';
     flash.style.display='flex';
     flash.style.opacity='1';
+  }else{
+    flash.style.opacity='0';
+    setTimeout(()=>{
+      flash.style.display='none';
+      if(players.length>0){
+        drawNext();
+      }
+    },500);
   }
 });
 
@@ -291,19 +282,22 @@ function resetAll(){
     document.getElementById('potBWheel').textContent='—';
   },10);
 }
+
+// COPY
 function copyResults(){
   let rows=document.querySelectorAll('#resultsBody tr');
   let text="Cerro Gordo World Cup Sweepstake Results\n\n";
 
   rows.forEach(row=>{
     let cols=row.querySelectorAll('td');
-    text += `${cols[0].innerText}. ${cols[1].innerText} - ${cols[2].innerText} / ${cols[3].innerText}\n`;
+    text+=`${cols[0].innerText}. ${cols[1].innerText} - ${cols[2].innerText} / ${cols[3].innerText}\n`;
   });
 
   navigator.clipboard.writeText(text).then(()=>{
-    alert("Results copied to clipboard!");
+    alert("Results copied!");
   });
 }
+
 </script>
 
 </body>
