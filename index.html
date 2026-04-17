@@ -49,7 +49,22 @@ th,td{
   padding:10px;
   border:1px solid #ddd;
 }
-
+<div id="countdownScreen" style="
+  position:fixed;
+  inset:0;
+  background:#000;
+  color:#ffd700;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  font-size:80px;
+  font-weight:bold;
+  z-index:10000;
+  text-align:center;
+">
+  <div id="countdownTimer"></div>
+</div>
 /* FLASH */
 #resultFlash{
   display:none;
