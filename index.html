@@ -223,9 +223,11 @@ function drawNext(){
 // COMPLETE
 function showComplete(){
   const flash=document.getElementById('resultFlash');
+
   document.getElementById('flashPlayer').textContent='🏆 DRAW COMPLETE';
-  document.getElementById('flashPotA').textContent='';
+  document.getElementById('flashPotA').textContent='Click to continue';
   document.getElementById('flashPotB').textContent='';
+
   flash.style.display='flex';
   flash.style.opacity='1';
 
@@ -233,24 +235,38 @@ function showComplete(){
   document.getElementById('playerWheel').textContent='—';
   document.getElementById('potAWheel').textContent='—';
   document.getElementById('potBWheel').textContent='—';
-}
 
 // PAUSE
 document.addEventListener('contextmenu', e=>{
   e.preventDefault();
+
   if(drawing) return;
+
   paused=!paused;
 
+  const flash=document.getElementById('resultFlash');
+
   if(paused){
-    const flash=document.getElementById('resultFlash');
     document.getElementById('flashPlayer').textContent='⏸ PAUSED';
     document.getElementById('flashPotA').textContent='Right click to resume';
     document.getElementById('flashPotB').textContent='';
+
     flash.style.display='flex';
     flash.style.opacity='1';
+  }else{
+    flash.style.opacity='0';
+
+    setTimeout(()=>{
+      flash.style.display='none';
+      
+      // 🔥 resume draw automatically if not finished
+      if(players.length>0){
+        drawNext();
+      }
+
+    },500);
   }
 });
-
 // RESET
 document.addEventListener('keydown', e=>{
   if(e.key.toLowerCase()==='r'){
