@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cerro Gordo World Cup Sweepstake Live Draw</title>
+
 <style>
 body{
   font-family:Arial,sans-serif;
@@ -11,18 +12,10 @@ body{
   margin:0;
   padding:20px;
 }
-.container{
-  max-width:1200px;
-  margin:auto;
-}
-h1,h2{
-  text-align:center;
-  color:white;
-}
-.controls{
-  text-align:center;
-  margin:20px 0;
-}
+.container{max-width:1200px;margin:auto}
+h1,h2{text-align:center;color:white}
+
+.controls{text-align:center;margin:20px 0}
 button{
   padding:12px 24px;
   margin:0 10px;
@@ -33,6 +26,7 @@ button{
 }
 #drawBtn{background:#1d4ed8;color:white}
 #resetBtn{background:#ddd}
+
 .wheels{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -45,78 +39,73 @@ button{
   border-radius:20px;
   box-shadow:0 4px 10px rgba(0,0,0,.2);
   text-align:center;
-  min-height:120px;
 }
-.wheel h3{margin-top:0;color:#666}
-.value{
-  font-size:28px;
-  font-weight:bold;
-  color:#0b3a75;
-}
+.value{font-size:28px;font-weight:bold;color:#0b3a75}
+
 table{
   width:100%;
   border-collapse:collapse;
   background:white;
-  box-shadow:0 4px 10px rgba(0,0,0,.2);
 }
 th,td{
   padding:10px;
   border:1px solid #ddd;
-  text-align:left;
 }
+
 #resultFlash{
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.88);
+  background:rgba(0,0,0,0.9);
   color:white;
   z-index:9999;
   justify-content:center;
   align-items:center;
   flex-direction:column;
   text-align:center;
-  font-size:64px;
-  font-weight:bold;
-  line-height:1.5;
 }
 </style>
 </head>
+
 <body>
+
 <div class="container">
 <h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
 
 <div class="controls">
-<button id="drawBtn" onclick="drawNext()">Draw Next</button>
-<button id="resetBtn" onclick="resetAll()">Reset</button>
+<button onclick="drawNext()">Draw Next</button>
+<button onclick="resetAll()">Reset</button>
 </div>
 
 <div class="wheels">
-<div class="wheel"><h3>Player</h3><div class="value" id="playerWheel">—</div></div>
-<div class="wheel"><h3>Pot A</h3><div class="value" id="potAWheel">—</div></div>
-<div class="wheel"><h3>Pot B</h3><div class="value" id="potBWheel">—</div></div>
+<div class="wheel"><h3>Player</h3><div id="playerWheel" class="value">—</div></div>
+<div class="wheel"><h3>Pot A</h3><div id="potAWheel" class="value">—</div></div>
+<div class="wheel"><h3>Pot B</h3><div id="potBWheel" class="value">—</div></div>
 </div>
 
-<h2>Draw Table (<span id="progress">0</span>/24 complete)</h2>
+<h2>Draw Table (<span id="progress">0</span>/24)</h2>
+
 <table>
-<thead>
-<tr><th>#</th><th>Player</th><th>Pot A</th><th>Pot B</th></tr>
-</thead>
+<thead><tr><th>#</th><th>Player</th><th>Pot A</th><th>Pot B</th></tr></thead>
 <tbody id="resultsBody"></tbody>
 </table>
 </div>
 
+<!-- RESULT FLASH -->
 <div id="resultFlash" onclick="drawNext()">
+
   <div id="flashPlayer" style="font-size:160px;color:#ffd700;"></div>
 
-  <div style="display:flex;align-items:center;justify-content:center;gap:20px;">
+  <div style="display:flex;align-items:center;gap:20px;">
     <img id="flagA" style="height:80px;">
-    <div id="flashPotA" style="font-size:110px;color:white;"></div>
+    <div id="flashPotA" style="font-size:110px;"></div>
   </div>
 
-  <div style="display:flex;align-items:center;justify-content:center;gap:20px;">
+  <div style="display:flex;align-items:center;gap:20px;">
     <img id="flagB" style="height:80px;">
-    <div id="flashPotB" style="font-size:110px;color:white;"></div>
+    <div id="flashPotB" style="font-size:110px;"></div>
   </div>
+
 </div>
 
 <audio id="bgMusic" loop>
@@ -124,99 +113,76 @@ th,td{
 </audio>
 
 <script>
-  const flags = {
-  "Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng",
-  "Portugal":"pt","Brazil":"br","Netherlands":"nl","Belgium":"be",
-  "Germany":"de","Croatia":"hr","Morocco":"ma","Colombia":"co",
-  "Uruguay":"uy","Mexico":"mx","USA":"us","Switzerland":"ch",
-  "Senegal":"sn","Japan":"jp","Iran":"ir","South Korea":"kr",
-  "Australia":"au","Austria":"at","Norway":"no","Canada":"ca",
 
-  "Paraguay":"py","Algeria":"dz","Egypt":"eg","Ghana":"gh",
-  "Cote d'Ivoire":"ci","Saudi Arabia":"sa","Qatar":"qa","Tunisia":"tn",
-  "Turkey":"tr","Czech Republic":"cz","Scotland":"gb-sct","Sweden":"se",
-  "South Africa":"za","New Zealand":"nz","Panama":"pa","Haiti":"ht",
-  "Curaçao":"cw","Cape Verde":"cv","Jordan":"jo","Uzbekistan":"uz",
-  "Iraq":"iq","Ecuador":"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"
-};
-   const initialPlayers=['Audrey','Ed','Liz','Andy','Carys','Mike','Steve B','Mary','June','Ray','Ian M','Margaret M','Jean','Elaine','Trevor','Sheila','Dave','Roy 1','Roy 2','Maria','Gill','Len','Fiona','Craig'];
+const playersSeed=['Audrey','Ed','Liz','Andy','Carys','Mike','Steve B','Mary','June','Ray','Ian M','Margaret M','Jean','Elaine','Trevor','Sheila','Dave','Roy 1','Roy 2','Maria','Gill','Len','Fiona','Craig'];
 
 const potASeed=['Argentina','Spain','France','England','Portugal','Brazil','Netherlands','Belgium','Germany','Croatia','Morocco','Colombia','Uruguay','Mexico','USA','Switzerland','Senegal','Japan','Iran','South Korea','Australia','Austria','Norway','Canada'];
 
 const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arabia','Qatar','Tunisia','Turkey','Czech Republic','Scotland','Sweden','South Africa','New Zealand','Panama','Haiti','Curaçao','Cape Verde','Jordan','Uzbekistan','Iraq','Ecuador','DR Congo','Bosnia & Herzegovina'];
 
-let players=[...initialPlayers];
-let potA=[...potASeed];
-let potB=[...potBSeed];
-let count=0;
-let drawing=false;
-let musicStarted=false;
+let players=[...playersSeed], potA=[...potASeed], potB=[...potBSeed];
+let count=0, drawing=false, paused=false, musicStarted=false;
 
-function randomItem(arr){
-  return arr[Math.floor(Math.random()*arr.length)];
-}
+const flags={
+ "Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng","Portugal":"pt","Brazil":"br",
+ "Netherlands":"nl","Belgium":"be","Germany":"de","Croatia":"hr","Morocco":"ma","Colombia":"co",
+ "Uruguay":"uy","Mexico":"mx","USA":"us","Switzerland":"ch","Senegal":"sn","Japan":"jp",
+ "Iran":"ir","South Korea":"kr","Australia":"au","Austria":"at","Norway":"no","Canada":"ca",
+ "Paraguay":"py","Algeria":"dz","Egypt":"eg","Ghana":"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa",
+ "Qatar":"qa","Tunisia":"tn","Turkey":"tr","Czech Republic":"cz","Scotland":"gb-sct","Sweden":"se",
+ "South Africa":"za","New Zealand":"nz","Panama":"pa","Haiti":"ht","Curaçao":"cw","Cape Verde":"cv",
+ "Jordan":"jo","Uzbekistan":"uz","Iraq":"iq","Ecuador":"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"
+};
 
-function spin(id, arr, finalValue, callback){
-  const el=document.getElementById(id);
-  let ticks=0;
-  const interval=setInterval(()=>{
+function randomItem(a){return a[Math.floor(Math.random()*a.length)]}
+
+function spin(id, arr, finalValue, cb){
+  let t=0, el=document.getElementById(id);
+  let i=setInterval(()=>{
     el.textContent=randomItem(arr);
-    ticks++;
-    if(ticks>=30){
-      clearInterval(interval);
+    if(++t>=30){
+      clearInterval(i);
       el.textContent=finalValue;
-      if(callback) callback();
+      cb&&cb();
     }
   },100);
 }
 
 function drawNext(){
-  if(paused) return;
-  if(drawing) return;
+  if(paused || drawing) return;
 
-  if(document.getElementById('resultFlash').style.display==='flex'){
-    document.getElementById('resultFlash').style.display='none';
-  }
-
+  document.getElementById('resultFlash').style.display='none';
   if(!players.length) return;
 
-  document.getElementById('flashPlayer').textContent=selectedPlayer;
-document.getElementById('flashPotA').textContent=selectedA;
-document.getElementById('flashPotB').textContent=selectedB;
+  ['playerWheel','potAWheel','potBWheel'].forEach(id=>document.getElementById(id).textContent='—');
 
-document.getElementById('flagA').src = "https://flagcdn.com/w80/" + flags[selectedA] + ".png";
-document.getElementById('flagB').src = "https://flagcdn.com/w80/" + flags[selectedB] + ".png";
-
-  const music=document.getElementById('bgMusic');
-  if(!musicStarted){
-    music.play();
-    musicStarted=true;
-  }
+  let music=document.getElementById('bgMusic');
+  if(!musicStarted){music.play();musicStarted=true;}
 
   drawing=true;
 
-  const selectedPlayer=randomItem(players);
-  const selectedA=randomItem(potA);
-  const selectedB=randomItem(potB);
+  let p=randomItem(players), a=randomItem(potA), b=randomItem(potB);
 
-  spin('playerWheel',players,selectedPlayer,()=>{
-    spin('potAWheel',potA,selectedA,()=>{
-      spin('potBWheel',potB,selectedB,()=>{
-        players=players.filter(x=>x!==selectedPlayer);
-        potA=potA.filter(x=>x!==selectedA);
-        potB=potB.filter(x=>x!==selectedB);
+  spin('playerWheel',players,p,()=>{
+    spin('potAWheel',potA,a,()=>{
+      spin('potBWheel',potB,b,()=>{
+        players=players.filter(x=>x!==p);
+        potA=potA.filter(x=>x!==a);
+        potB=potB.filter(x=>x!==b);
         count++;
 
-        document.getElementById('resultsBody').insertAdjacentHTML(
-          'beforeend',
-          `<tr><td>${count}</td><td>${selectedPlayer}</td><td>${selectedA}</td><td>${selectedB}</td></tr>`
-        );
+        document.getElementById('resultsBody').insertAdjacentHTML('beforeend',
+          `<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`);
 
         document.getElementById('progress').textContent=count;
 
-        document.getElementById('flashPlayer').textContent=selectedPlayer;
-        document.getElementById('flashPotA').textContent=selectedA;
-        document.getElementById('flashPotB').textContent=selectedB;
+        document.getElementById('flashPlayer').textContent=p;
+        document.getElementById('flashPotA').textContent=a;
+        document.getElementById('flashPotB').textContent=b;
+
+        document.getElementById('flagA').src=`https://flagcdn.com/w80/${flags[a]}.png`;
+        document.getElementById('flagB').src=`https://flagcdn.com/w80/${flags[b]}.png`;
+
         document.getElementById('resultFlash').style.display='flex';
 
         drawing=false;
@@ -225,32 +191,9 @@ document.getElementById('flagB').src = "https://flagcdn.com/w80/" + flags[select
   });
 }
 
-function resetAll(){
-  players=[...initialPlayers];
-  potA=[...potASeed];
-  potB=[...potBSeed];
-  count=0;
-  drawing=false;
-  musicStarted=false;
-
-  const music=document.getElementById('bgMusic');
-  music.pause();
-  music.currentTime=0;
-
-  document.getElementById('resultsBody').innerHTML='';
-  document.getElementById('progress').textContent='0';
-  document.getElementById('playerWheel').textContent='—';
-  document.getElementById('potAWheel').textContent='—';
-  document.getElementById('potBWheel').textContent='—';
-  document.getElementById('resultFlash').style.display='none';
-}
- let paused=false;
-
-document.addEventListener('contextmenu', function(e){
+document.addEventListener('contextmenu', e=>{
   e.preventDefault();
-
   if(drawing) return;
-
   paused=!paused;
 
   if(paused){
@@ -262,13 +205,27 @@ document.addEventListener('contextmenu', function(e){
     document.getElementById('resultFlash').style.display='none';
   }
 });
- document.addEventListener('keydown', function(e){
+
+document.addEventListener('keydown', e=>{
   if(e.key.toLowerCase()==='r'){
-    if(confirm('Reset the full draw?')){
-      resetAll();
-    }
+    if(confirm('Reset draw?')) resetAll();
   }
-}); 
+});
+
+function resetAll(){
+  players=[...playersSeed];
+  potA=[...potASeed];
+  potB=[...potBSeed];
+  count=0; paused=false; drawing=false; musicStarted=false;
+
+  document.getElementById('bgMusic').pause();
+  document.getElementById('bgMusic').currentTime=0;
+
+  document.getElementById('resultsBody').innerHTML='';
+  document.getElementById('progress').textContent='0';
+  document.getElementById('resultFlash').style.display='none';
+}
 </script>
+
 </body>
 </html>
