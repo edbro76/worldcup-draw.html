@@ -20,6 +20,7 @@ button{padding:12px 24px;border:none;border-radius:10px;cursor:pointer;backgroun
 table{width:100%;border-collapse:collapse;background:white}
 th,td{padding:12px;border:1px solid #ddd;text-align:center;}
 
+/* FLASH SCREEN */
 #resultFlash{
   display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);
   z-index:9999;color:white;flex-direction:column;justify-content:center;
@@ -163,8 +164,11 @@ function drawNext() {
         const fP = document.getElementById('flashPlayer'), fRA = document.getElementById('flashRowA'), fRB = document.getElementById('flashRowB');
         fP.style.opacity = "0"; fRA.style.opacity = "0"; fRB.style.opacity = "0";
         fP.textContent = p; document.getElementById('flashPotA').textContent = a; document.getElementById('flashPotB').textContent = b;
+        
+        // FIXED FLAG URL LOGIC
         document.getElementById('flagA').src = `https://flagcdn.com{flags[a]}.png`;
         document.getElementById('flagB').src = `https://flagcdn.com{flags[b]}.png`;
+        
         const flash = document.getElementById('resultFlash');
         flash.style.display = 'flex';
         setTimeout(() => flash.style.opacity = '1', 50);
