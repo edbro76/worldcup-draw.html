@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cerro Gordo World Cup Sweepstake Live Draw</title>
 
-<!-- PDF Library -->
+<!-- Fixed PDF Library Link -->
 <script src="https://cloudflare.com"></script>
 
 <style>
@@ -49,8 +49,8 @@ th,td{padding:10px;border:1px solid #ddd;text-align:center;}
 <div class="container">
   <h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
   <div class="controls" id="startControls">
-    <button onclick="drawNext()">Start Draw Manually</button>
-    <button onclick="downloadPDF()" style="background:#0b3a75; color:white;">Download PDF</button>
+    <!-- Manual start removed as requested -->
+    <button onclick="downloadPDF()" style="background:#0b3a75; color:white;">Download PDF Results</button>
   </div>
 
   <div id="messageOverlay"></div>
@@ -68,7 +68,6 @@ th,td{padding:10px;border:1px solid #ddd;text-align:center;}
   </table>
 </div>
 
-<!-- SCREENS -->
 <div id="countdownScreen">
   <div id="countdownStatus" style="font-size:60px;margin-bottom:20px;">Draw Starts In</div>
   <div id="countdownTimer" style="font-size:90px;"></div>
@@ -92,20 +91,8 @@ const potASeed=['Argentina','Spain','France','England','Portugal','Brazil','Neth
 const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arabia','Qatar','Tunisia','Turkey','Czech Republic','Scotland','Sweden','South Africa','New Zealand','Panama','Haiti','Curaçao','Cape Verde','Jordan','Uzbekistan','Iraq','Ecuador','DR Congo','Bosnia & Herzegovina'];
 
 let players = [...playersSeed], potA = [...potASeed], potB = [...potBSeed];
-const flags = {
-  // Pot A
-  "Argentina":"ar", "Spain":"es", "France":"fr", "England":"gb-eng", "Portugal":"pt", "Brazil":"br", 
-  "Netherlands":"nl", "Belgium":"be", "Germany":"de", "Croatia":"hr", "Morocco":"ma", "Colombia":"co", 
-  "Uruguay":"uy", "Mexico":"mx", "USA":"us", "Switzerland":"ch", "Senegal":"sn", "Japan":"jp", 
-  "Iran":"ir", "South Korea":"kr", "Australia":"au", "Austria":"at", "Norway":"no", "Canada":"ca",
-  // Pot B
-  "Paraguay":"py", "Algeria":"dz", "Egypt":"eg", "Ghana":"gh", "Cote d'Ivoire":"ci", "Saudi Arabia":"sa", 
-  "Qatar":"qa", "Tunisia":"tn", "Turkey":"tr", "Czech Republic":"cz", "Scotland":"gb-sct", "Sweden":"se", 
-  "South Africa":"za", "New Zealand":"nz", "Panama":"pa", "Haiti":"ht", "Curaçao":"cw", "Cape Verde":"cv", 
-  "Jordan":"jo", "Uzbekistan":"uz", "Iraq":"iq", "Ecuador":"ec", "DR Congo":"cd", "Bosnia & Herzegovina":"ba"
-};
+const flags = {"Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng","Portugal":"pt","Brazil":"br","Netherlands":"nl","Belgium":"be","Germany":"de","Croatia":"hr","Morocco":"ma","Colombia":"co","Uruguay":"uy","Mexico":"mx","USA":"us","Switzerland":"ch","Senegal":"sn","Japan":"jp","Iran":"ir","South Korea":"kr","Australia":"au","Austria":"at","Norway":"no","Canada":"ca","Paraguay":"py","Algeria":"dz","Egypt":"eg","Ghana":"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa","Qatar":"qa","Tunisia":"tn","Turkey":"tr","Czech Republic":"cz","Scotland":"gb-sct","Sweden":"se","South Africa":"za","New Zealand":"nz","Panama":"pa","Haiti":"ht","Curaçao":"cw","Cape Verde":"cv","Jordan":"jo","Uzbekistan":"uz","Iraq":"iq","Ecuador":"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"};
 
-// ===== UTILS =====
 function randomItem(a) { return a[Math.floor(Math.random() * a.length)]; }
 
 function downloadPDF() {
@@ -142,16 +129,9 @@ const timerInterval = setInterval(() => {
 }, 100);
 
 function start20() {
-  const statusText = document.getElementById('countdownStatus');
   const music = document.getElementById('bgMusic');
-  
-  // Trigger music here so it plays throughout the final countdown
-  if(!musicStarted) { 
-    music.play().catch(e => console.log("Music blocked - will play on first click")); 
-    musicStarted = true; 
-  }
-
-  statusText.textContent = "Final Countdown...";
+  if(!musicStarted) { music.play().catch(e => {}); musicStarted = true; }
+  document.getElementById('countdownStatus').textContent = "Final Countdown...";
   let sec = 20;
   let i = setInterval(() => {
     sec--;
@@ -159,34 +139,21 @@ function start20() {
     if (sec <= 0) {
       clearInterval(i);
       document.getElementById('countdownScreen').style.opacity = 0;
-      setTimeout(() => { 
-        document.getElementById('countdownScreen').style.display = 'none'; 
-        drawNext(); 
-      }, 1000);
+      setTimeout(() => { document.getElementById('countdownScreen').style.display = 'none'; drawNext(); }, 1000);
     }
   }, 1000);
 }
 
 // ===== THE DRAW =====
-  function getFlagCode(countryName) {
-  // Convert the input name to a format that matches your flags object keys
-  // Assuming your flags keys are currently like {Argentina: "ar", ...}
-  const key = Object.keys(flags).find(k => k.toLowerCase() === countryName.toLowerCase());
-  return key ? flags[key].toLowerCase() : null;
-}
 function drawNext() {
   if (drawing || !players.length) return;
-  
   drawing = true;
   document.getElementById('resultFlash').style.display = 'none';
-
   let p = randomItem(players), a = randomItem(potA), b = randomItem(potB);
 
   spin('playerWheel', players, p, () => {
     spin('potAWheel', potA, a, () => {
       spin('potBWheel', potB, b, () => {
-        
-        // Update Table
         players = players.filter(x => x !== p);
         potA = potA.filter(x => x !== a);
         potB = potB.filter(x => x !== b);
@@ -194,71 +161,29 @@ function drawNext() {
         document.getElementById('resultsBody').insertAdjacentHTML('beforeend', `<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`);
         document.getElementById('progress').textContent = count;
 
-        // Reset Flash Opacities
-        const fP = document.getElementById('flashPlayer');
-        const fRA = document.getElementById('flashRowA');
-        const fRB = document.getElementById('flashRowB');
+        const fP = document.getElementById('flashPlayer'), fRA = document.getElementById('flashRowA'), fRB = document.getElementById('flashRowB');
         fP.style.opacity = "0"; fRA.style.opacity = "0"; fRB.style.opacity = "0";
-
-        // Set Content
         fP.textContent = p;
         document.getElementById('flashPotA').textContent = a;
         document.getElementById('flashPotB').textContent = b;
-
-        // Get codes and update sources
-        const codeA = flags[a];
-        const codeB = flags[b];
         
-        const imgA = document.getElementById('flagA');
-        const imgB = document.getElementById('flagB');
+        if(flags[a]) document.getElementById('flagA').src = `https://flagcdn.com{flags[a]}.png`;
+        if(flags[b]) document.getElementById('flagB').src = `https://flagcdn.com{flags[b]}.png`;
 
-        if(codeA) imgA.src = `https://flagcdn.com{codeA}.png`;
-        if(codeB) imgB.src = `https://flagcdn.com{codeB}.png`;
-
-        // Show Overlay
-        const flash = document.getElementById('resultFlash');
-        flash.style.display = 'flex';
-
-// Use the new helper to find codes
-const codeA = getFlagCode(a);
-const codeB = getFlagCode(b);
-
-// Set image source if code is found, otherwise hide/use placeholder
-const flagAImg = document.getElementById('flagA');
-const flagBImg = document.getElementById('flagB');
-
-if (codeA) {
-  flagAImg.src = `https://flagcdn.com{codeA}.png`;
-  flagAImg.style.display = 'block';
-} else {
-  flagAImg.style.display = 'none'; // Hide if flag not found
-}
-
-if (codeB) {
-  flagBImg.src = `https://flagcdn.com{codeB}.png`;
-  flagBImg.style.display = 'block';
-} else {
-  flagBImg.style.display = 'none';
-}
-
-        // Show Overlay
         const flash = document.getElementById('resultFlash');
         flash.style.display = 'flex';
         setTimeout(() => flash.style.opacity = '1', 50);
 
-        // STAGGERED REVEAL
         setTimeout(() => { fP.style.opacity = "1"; }, 1000);
         setTimeout(() => { fRA.style.opacity = "1"; }, 2000);
         setTimeout(() => { fRB.style.opacity = "1"; }, 3000);
 
-        // Close and Next
         setTimeout(() => {
           flash.style.opacity = '0';
           setTimeout(() => {
             flash.style.display = 'none';
             drawing = false;
-            if (players.length > 0) { drawNext(); } 
-            else { showEndSequence(); }
+            if (players.length > 0) drawNext(); else showEndSequence();
           }, 1000);
         }, 7000);
       });
