@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cerro Gordo World Cup Sweepstake Live Draw</title>
 
-<!-- PDF & Flag Icon Libraries -->
 <script src="https://cloudflare.com"></script>
-<link rel="stylesheet" href="https://cloudflare.com">
 
 <style>
 body{font-family:Arial;background:#2b2b2b;margin:0;padding:20px}
@@ -21,31 +19,26 @@ button{padding:12px 24px;border:none;border-radius:10px;cursor:pointer;backgroun
 table{width:100%;border-collapse:collapse;background:white}
 th,td{padding:10px;border:1px solid #ddd;text-align:center;}
 
-/* FLASH SCREEN */
 #resultFlash{
   display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);
   z-index:9999;color:white;flex-direction:column;justify-content:center;
-  align-items:center;text-align:center;opacity:0;transition:opacity 2s ease; /* Slower 2s background fade */
+  align-items:center;text-align:center;opacity:0;transition:opacity 0.8s ease; 
 }
-#flashPlayer{font-size:100px;color:#ffd700;margin-bottom:30px;transition:opacity 1s;}
-.flashRow{display:flex;align-items:center;justify-content:center;gap:20px;font-size:60px;margin:15px 0;transition:opacity 1s;}
+#flashPlayer{font-size:100px;color:#ffd700;margin-bottom:20px;transition:opacity 0.5s;}
+.flashRow{display:flex;align-items:center;justify-content:center;gap:20px;font-size:60px;margin:10px 0;transition:opacity 0.5s;}
+.flashRow img{height:80px;border-radius:5px;border:1px solid #555;}
 
-/* Flag Icon Styling */
-.fi { width: 120px; height: 80px; border-radius: 8px; }
-
-/* COUNTDOWN SCREEN */
 #countdownScreen{
   position:fixed;inset:0;background:#000;color:#ffd700;
   display:flex;flex-direction:column;justify-content:center;
   align-items:center;z-index:10000;text-align:center;transition:opacity 1s;
 }
 
-/* MESSAGE OVERLAY */
 #messageOverlay {
   display:none; position:fixed; inset:0; background:black; z-index:10001;
   color:#ffd700; flex-direction:column; justify-content:center;
   align-items:center; text-align:center; opacity:0; transition:opacity 1s ease;
-  font-size: 60px; font-weight: bold; padding: 40px;
+  font-size: 60px; font-weight: bold;
 }
 </style>
 </head>
@@ -80,24 +73,22 @@ th,td{padding:10px;border:1px solid #ddd;text-align:center;}
 
 <div id="resultFlash">
   <div id="flashPlayer"></div>
-  <div id="flashRowA" class="flashRow"><span id="flagA" class="fi"></span><div id="flashPotA"></div></div>
-  <div id="flashRowB" class="flashRow"><span id="flagB" class="fi"></span><div id="flashPotB"></div></div>
+  <div id="flashRowA" class="flashRow"><img id="flagA"><div id="flashPotA"></div></div>
+  <div id="flashRowB" class="flashRow"><img id="flagB"><div id="flashPotB"></div></div>
 </div>
 
 <audio id="bgMusic" loop><source src="themetune.mp3" type="audio/mpeg"></audio>
 
 <script>
-// ===== DATA & SETUP =====
-const drawDate = new Date(Date.now() + 10000); // 10s Test Countdown
+const drawDate = new Date(Date.now() + 10000); 
 let phase = 1, musicStarted = false, count = 0, drawing = false;
 
 const playersSeed=['Audrey','Ed','Liz','Andy','Carys','Mike','Steve B','Mary','June','Ray','Ian M','Margaret M','Jean','Elaine','Trevor','Sheila','Dave','Roy 1','Roy 2','Maria','Gill','Len','Fiona','Craig'];
 const potASeed=['Argentina','Spain','France','England','Portugal','Brazil','Netherlands','Belgium','Germany','Croatia','Morocco','Colombia','Uruguay','Mexico','USA','Switzerland','Senegal','Japan','Iran','South Korea','Australia','Austria','Norway','Canada'];
-const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arabia','Qatar','Tunisia','Turkey','Czech Republic','Scotland','Sweden','South Africa','New Zealand','Panama','Haiti','Curaçao','Cape Verde','Jordan','Uzbekistan','Iraq','Ecuador','DR Congo','Bosnia & Herzegovina'];
+const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arabia','Qatar','Inter Milan','Tunisia','Turkey','Czech Republic','Scotland','Sweden','South Africa','New Zealand','Panama','Haiti','Curaçao','Cape Verde','Jordan','Uzbekistan','Iraq','Ecuador','DR Congo','Bosnia & Herzegovina'];
 
 let players = [...playersSeed], potA = [...potASeed], potB = [...potBSeed];
 
-// Reliable Flag Icon Mapping
 const flags = {"Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng","Portugal":"pt","Brazil":"br","Netherlands":"nl","Belgium":"be","Germany":"de","Croatia":"hr","Morocco":"ma","Colombia":"co","Uruguay":"uy","Mexico":"mx","USA":"us","Switzerland":"ch","Senegal":"sn","Japan":"jp","Iran":"ir","South Korea":"kr","Australia":"au","Austria":"at","Norway":"no","Canada":"ca","Paraguay":"py","Algeria":"dz","Egypt":"eg","Ghana":"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa","Qatar":"qa","Tunisia":"tn","Turkey":"tr","Czech Republic":"cz","Scotland":"gb-sct","Sweden":"se","South Africa":"za","New Zealand":"nz","Panama":"pa","Haiti":"ht","Curaçao":"cw","Cape Verde":"cv","Jordan":"jo","Uzbekistan":"uz","Iraq":"iq","Ecuador":"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"};
 
 function randomItem(a) { return a[Math.floor(Math.random() * a.length)]; }
@@ -115,7 +106,6 @@ function showEndSequence() {
   setTimeout(() => { msg.style.opacity = "0"; }, 5000);
   setTimeout(() => { msg.textContent = "Thanks for participating and good luck!"; msg.style.opacity = "1"; }, 6000);
   setTimeout(() => { msg.style.opacity = "0"; }, 11000);
-  setTimeout(() => { msg.style.display = "none"; }, 12000);
 }
 
 function spin(id, arr, finalValue, cb) {
@@ -126,7 +116,6 @@ function spin(id, arr, finalValue, cb) {
   }, 100);
 }
 
-// ===== TIMERS =====
 const timerInterval = setInterval(() => {
   if (phase === 1) {
     const diff = drawDate - Date.now();
@@ -151,7 +140,6 @@ function start20() {
   }, 1000);
 }
 
-// ===== THE DRAW =====
 function drawNext() {
   if (drawing || !players.length) return;
   drawing = true;
@@ -161,8 +149,6 @@ function drawNext() {
   spin('playerWheel', players, p, () => {
     spin('potAWheel', potA, a, () => {
       spin('potBWheel', potB, b, () => {
-        
-        // Update Table Record
         players = players.filter(x => x !== p);
         potA = potA.filter(x => x !== a);
         potB = potB.filter(x => x !== b);
@@ -170,37 +156,33 @@ function drawNext() {
         document.getElementById('resultsBody').insertAdjacentHTML('beforeend', `<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`);
         document.getElementById('progress').textContent = count;
 
-        // Set Flash Content & Hide
         const fP = document.getElementById('flashPlayer'), fRA = document.getElementById('flashRowA'), fRB = document.getElementById('flashRowB');
-        const flagA = document.getElementById('flagA'), flagB = document.getElementById('flagB');
-
         fP.style.opacity = "0"; fRA.style.opacity = "0"; fRB.style.opacity = "0";
         fP.textContent = p;
         document.getElementById('flashPotA').textContent = a;
         document.getElementById('flashPotB').textContent = b;
         
-        flagA.className = `fi fi-${flags[a]}`;
-        flagB.className = `fi fi-${flags[b]}`;
+        // Return to FlagCDN (Direct image links)
+        if(flags[a]) document.getElementById('flagA').src = `https://flagcdn.com{flags[a]}.png`;
+        if(flags[b]) document.getElementById('flagB').src = `https://flagcdn.com{flags[b]}.png`;
 
-        // Slow Entrance
         const flash = document.getElementById('resultFlash');
         flash.style.display = 'flex';
         setTimeout(() => flash.style.opacity = '1', 50);
 
-        // Staggered reveals
-        setTimeout(() => { fP.style.opacity = "1"; }, 2500); // Wait for background
-        setTimeout(() => { fRA.style.opacity = "1"; }, 4000); // Pot A 1.5s later
-        setTimeout(() => { fRB.style.opacity = "1"; }, 5500); // Pot B 1.5s later
+        // SNAPPY REVEAL TIMINGS
+        setTimeout(() => { fP.style.opacity = "1"; }, 1000); // Background in first
+        setTimeout(() => { fRA.style.opacity = "1"; }, 1800); // 0.8s later
+        setTimeout(() => { fRB.style.opacity = "1"; }, 2600); // 0.8s later
 
-        // Final hold time
         setTimeout(() => {
           flash.style.opacity = '0';
           setTimeout(() => {
             flash.style.display = 'none';
             drawing = false;
             if (players.length > 0) drawNext(); else showEndSequence();
-          }, 1000);
-        }, 9500);
+          }, 800);
+        }, 5500); // Total display time shortened
       });
     });
   });
