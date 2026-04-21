@@ -281,27 +281,39 @@ if(players.length) drawNext(); else showComplete();
 // COMPLETE
 function showComplete(){
 
+  // wait 20 seconds after last draw
   setTimeout(()=>{
 
     const flash = document.getElementById('resultFlash');
 
-    flashPlayer.textContent='🏆 DRAW COMPLETE';
-    flashPotA.textContent='Thank you for participating';
-    flashPotB.textContent='';
+    // set message
+    document.getElementById('flashPlayer').textContent='🏆 DRAW COMPLETE';
+    document.getElementById('flashPotA').textContent='';
+    document.getElementById('flashPotB').textContent='';
 
+    // show
     flash.style.display='flex';
     setTimeout(()=>flash.style.opacity='1',50);
 
+    // stay visible 10 seconds
     setTimeout(()=>{
+
+      // fade out
       flash.style.opacity='0';
-      setTimeout(()=>flash.style.display='none',1000);
+
+      setTimeout(()=>{
+        flash.style.display='none';
+      },1000);
+
     },20000);
 
-  },20000);
+  },10000); // delay before showing
 
-  ['playerWheel','potAWheel','potBWheel'].forEach(id=>document.getElementById(id).textContent='—');
+  // clear wheels
+  document.getElementById('playerWheel').textContent='—';
+  document.getElementById('potAWheel').textContent='—';
+  document.getElementById('potBWheel').textContent='—';
 }
-
 // PAUSE
 document.addEventListener('contextmenu',e=>{
 e.preventDefault();
