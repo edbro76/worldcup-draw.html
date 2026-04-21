@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cerro Gordo World Cup Sweepstake Live Draw</title>
 
-<script src="https://cloudflare.com"></script>
+<!-- PDF Library - Ensure this is at the TOP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 body{font-family:Arial;background:#2b2b2b;margin:0;padding:20px}
@@ -20,13 +21,15 @@ table{width:100%;border-collapse:collapse;background:white}
 th,td{padding:10px;border:1px solid #ddd;text-align:center;}
 
 #resultFlash{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);
   z-index:9999;color:white;flex-direction:column;justify-content:center;
   align-items:center;text-align:center;opacity:0;transition:opacity 0.8s ease; 
 }
 #flashPlayer{font-size:100px;color:#ffd700;margin-bottom:20px;transition:opacity 0.5s;}
 .flashRow{display:flex;align-items:center;justify-content:center;gap:20px;font-size:60px;margin:10px 0;transition:opacity 0.5s;}
-.flashRow img{height:80px;border-radius:5px;border:1px solid #555;}
+
+.flag-box { font-size: 80px; line-height: 1; display: flex; align-items: center; justify-content: center; min-width: 140px; }
+.flag-box img { height: 80px; border-radius: 5px; border: 1px solid #444; }
 
 #countdownScreen{
   position:fixed;inset:0;background:#000;color:#ffd700;
@@ -34,12 +37,18 @@ th,td{padding:10px;border:1px solid #ddd;text-align:center;}
   align-items:center;z-index:10000;text-align:center;transition:opacity 1s;
 }
 
+/* BIGGER ENDING COMMENTS STYLE */
 #messageOverlay {
   display:none; position:fixed; inset:0; background:black; z-index:10001;
   color:#ffd700; flex-direction:column; justify-content:center;
   align-items:center; text-align:center; opacity:0; transition:opacity 1s ease;
-  font-size: 60px; font-weight: bold;
+  font-size: 90px; /* Increased from 60px */
+  font-weight: bold;
+  padding: 50px;
 }
+
+/* Initially hide PDF button container */
+#finalControls { display: none; margin-top: 20px; }
 </style>
 </head>
 
@@ -47,8 +56,10 @@ th,td{padding:10px;border:1px solid #ddd;text-align:center;}
 
 <div class="container">
   <h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
-  <div class="controls">
-    <button onclick="downloadPDF()" style="background:#0b3a75; color:white;">Download PDF Results</button>
+  
+  <!-- PDF Button only shows at the very end -->
+  <div class="controls" id="finalControls">
+    <button onclick="downloadPDF()" style="background:#0b3a75; color:white; font-size: 20px;">Download Final Results PDF</button>
   </div>
 
   <div id="messageOverlay"></div>
@@ -73,39 +84,85 @@ th,td{padding:10px;border:1px solid #ddd;text-align:center;}
 
 <div id="resultFlash">
   <div id="flashPlayer"></div>
-  <div id="flashRowA" class="flashRow"><img id="flagA"><div id="flashPotA"></div></div>
-  <div id="flashRowB" class="flashRow"><img id="flagB"><div id="flashPotB"></div></div>
+  <div id="flashRowA" class="flashRow">
+    <div class="flag-box" id="boxA"><img id="flagA"></div>
+    <div id="flashPotA"></div>
+  </div>
+  <div id="flashRowB" class="flashRow">
+    <div class="flag-box" id="boxB"><img id="flagB"></div>
+    <div id="flashPotB"></div>
+  </div>
 </div>
 
 <audio id="bgMusic" loop><source src="themetune.mp3" type="audio/mpeg"></audio>
 
 <script>
+// ===== SETUP =====
 const drawDate = new Date(Date.now() + 10000); 
 let phase = 1, musicStarted = false, count = 0, drawing = false;
 
 const playersSeed=['Audrey','Ed','Liz','Andy','Carys','Mike','Steve B','Mary','June','Ray','Ian M','Margaret M','Jean','Elaine','Trevor','Sheila','Dave','Roy 1','Roy 2','Maria','Gill','Len','Fiona','Craig'];
 const potASeed=['Argentina','Spain','France','England','Portugal','Brazil','Netherlands','Belgium','Germany','Croatia','Morocco','Colombia','Uruguay','Mexico','USA','Switzerland','Senegal','Japan','Iran','South Korea','Australia','Austria','Norway','Canada'];
-const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arabia','Qatar','Inter Milan','Tunisia','Turkey','Czech Republic','Scotland','Sweden','South Africa','New Zealand','Panama','Haiti','Curaçao','Cape Verde','Jordan','Uzbekistan','Iraq','Ecuador','DR Congo','Bosnia & Herzegovina'];
+const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arabia','Qatar','Tunisia','Turkey','Czech Republic','Scotland','Sweden','South Africa','New Zealand','Panama','Haiti','Curaçao','Cape Verde','Jordan','Uzbekistan','Iraq','Ecuador','DR Congo','Bosnia & Herzegovina'];
 
 let players = [...playersSeed], potA = [...potASeed], potB = [...potBSeed];
-
 const flags = {"Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng","Portugal":"pt","Brazil":"br","Netherlands":"nl","Belgium":"be","Germany":"de","Croatia":"hr","Morocco":"ma","Colombia":"co","Uruguay":"uy","Mexico":"mx","USA":"us","Switzerland":"ch","Senegal":"sn","Japan":"jp","Iran":"ir","South Korea":"kr","Australia":"au","Austria":"at","Norway":"no","Canada":"ca","Paraguay":"py","Algeria":"dz","Egypt":"eg","Ghana":"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa","Qatar":"qa","Tunisia":"tn","Turkey":"tr","Czech Republic":"cz","Scotland":"gb-sct","Sweden":"se","South Africa":"za","New Zealand":"nz","Panama":"pa","Haiti":"ht","Curaçao":"cw","Cape Verde":"cv","Jordan":"jo","Uzbekistan":"uz","Iraq":"iq","Ecuador":"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"};
 
 function randomItem(a) { return a[Math.floor(Math.random() * a.length)]; }
 
+function getEmoji(code) {
+  if (!code) return "🚩";
+  if (code === 'gb-eng') return "🏴󠁧󠁢󠁥󠁮󠁧󠁿";
+  if (code === 'gb-sct') return "🏴󠁧󠁢󠁳󠁣󠁴󠁿";
+  return code.toUpperCase().replace(/./g, char => String.fromCodePoint(char.charCodeAt(0) + 127397));
+}
+
+// Improved PDF Download Logic
 function downloadPDF() {
   const element = document.getElementById('resultsTable');
-  const opt = { margin: 1, filename: 'Sweepstake_Results.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
-  html2pdf().set(opt).from(element).save();
+  const opt = { 
+    margin: 0.5, 
+    filename: 'Sweepstake_Results.pdf', 
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true }, 
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } 
+  };
+  
+  // New safe execution pattern for html2pdf
+  if (typeof html2pdf !== 'undefined') {
+    html2pdf().set(opt).from(element).save().catch(err => {
+      console.error("PDF generation failed:", err);
+      alert("There was an error creating your PDF. Please try again.");
+    });
+  } else {
+    alert("PDF library is still loading. Please wait a moment.");
+  }
 }
 
 function showEndSequence() {
   const msg = document.getElementById('messageOverlay');
+  const finalBtn = document.getElementById('finalControls');
+  
   msg.style.display = 'flex';
+  
+  // 1. Fade in "Draw Complete"
   setTimeout(() => { msg.textContent = "Draw Complete"; msg.style.opacity = "1"; }, 100);
+  
+  // 2. Fade out "Draw Complete" after 5s
   setTimeout(() => { msg.style.opacity = "0"; }, 5000);
-  setTimeout(() => { msg.textContent = "Thanks for participating and good luck!"; msg.style.opacity = "1"; }, 6000);
-  setTimeout(() => { msg.style.opacity = "0"; }, 11000);
+  
+  // 3. Fade in "Thanks for participating..."
+  setTimeout(() => { 
+    msg.textContent = "Thanks for participating and good luck!"; 
+    msg.style.opacity = "1"; 
+  }, 6100);
+  
+  // 4. Final fade out, hide overlay, and SHOW PDF BUTTON
+  setTimeout(() => { msg.style.opacity = "0"; }, 11100);
+  setTimeout(() => { 
+    msg.style.display = "none";
+    finalBtn.style.display = "flex"; // Show the button now
+  }, 12100);
 }
 
 function spin(id, arr, finalValue, cb) {
@@ -116,6 +173,7 @@ function spin(id, arr, finalValue, cb) {
   }, 100);
 }
 
+// ===== TIMERS =====
 const timerInterval = setInterval(() => {
   if (phase === 1) {
     const diff = drawDate - Date.now();
@@ -140,6 +198,7 @@ function start20() {
   }, 1000);
 }
 
+// ===== DRAW =====
 function drawNext() {
   if (drawing || !players.length) return;
   drawing = true;
@@ -157,23 +216,33 @@ function drawNext() {
         document.getElementById('progress').textContent = count;
 
         const fP = document.getElementById('flashPlayer'), fRA = document.getElementById('flashRowA'), fRB = document.getElementById('flashRowB');
+        const imgA = document.getElementById('flagA'), imgB = document.getElementById('flagB');
+        const boxA = document.getElementById('boxA'), boxB = document.getElementById('boxB');
+
         fP.style.opacity = "0"; fRA.style.opacity = "0"; fRB.style.opacity = "0";
         fP.textContent = p;
         document.getElementById('flashPotA').textContent = a;
         document.getElementById('flashPotB').textContent = b;
-        
-        // Return to FlagCDN (Direct image links)
-        if(flags[a]) document.getElementById('flagA').src = `https://flagcdn.com{flags[a]}.png`;
-        if(flags[b]) document.getElementById('flagB').src = `https://flagcdn.com{flags[b]}.png`;
+
+        // Reset display
+        imgA.style.display = 'block'; boxA.querySelector('span')?.remove();
+        imgB.style.display = 'block'; boxB.querySelector('span')?.remove();
+
+        const codeA = flags[a], codeB = flags[b];
+        imgA.src = `https://flagcdn.com{codeA}.png`;
+        imgB.src = `https://flagcdn.com{codeB}.png`;
+
+        imgA.onerror = () => { imgA.style.display = 'none'; boxA.insertAdjacentHTML('beforeend', `<span>${getEmoji(codeA)}</span>`); };
+        imgB.onerror = () => { imgB.style.display = 'none'; boxB.insertAdjacentHTML('beforeend', `<span>${getEmoji(codeB)}</span>`); };
 
         const flash = document.getElementById('resultFlash');
         flash.style.display = 'flex';
         setTimeout(() => flash.style.opacity = '1', 50);
 
-        // SNAPPY REVEAL TIMINGS
-        setTimeout(() => { fP.style.opacity = "1"; }, 1000); // Background in first
-        setTimeout(() => { fRA.style.opacity = "1"; }, 1800); // 0.8s later
-        setTimeout(() => { fRB.style.opacity = "1"; }, 2600); // 0.8s later
+        // Timings (snappy 0.8s reveals)
+        setTimeout(() => { fP.style.opacity = "1"; }, 1000); 
+        setTimeout(() => { fRA.style.opacity = "1"; }, 1800); 
+        setTimeout(() => { fRB.style.opacity = "1"; }, 2600); 
 
         setTimeout(() => {
           flash.style.opacity = '0';
@@ -182,7 +251,7 @@ function drawNext() {
             drawing = false;
             if (players.length > 0) drawNext(); else showEndSequence();
           }, 800);
-        }, 5500); // Total display time shortened
+        }, 5500); 
       });
     });
   });
