@@ -391,7 +391,97 @@ text+=`${c[0].innerText}. ${c[1].innerText} - ${c[2].innerText} / ${c[3].innerTe
 });
 navigator.clipboard.writeText(text);
 }
+// 🎯 MAIN DRAW DATE
+const drawDate = new Date("2026-05-24T19:00:00");
 
+let phase = 1; // 1 = main countdown, 2 = 20 sec countdown
+
+const screen = document.getElementById('countdownScreen');
+const timer = document.getElementById('countdownTimer');
+const title = document.getElementById('countdownTitle');
+
+function updateCountdown(){
+
+  const now = new Date();
+
+  // ===== PHASE 1 =====
+  if(phase === 1){
+
+    const diff = drawDate - now;
+
+    if(diff <= 0){
+      // fade out main timer
+      screen.style.opacity = 0;
+
+      setTimeout(()=>{
+        // switch to 20 sec phase
+        phase = 2;
+        start20SecondCountdown();
+      },1000);
+
+      return;
+    }
+
+    const d=Math.floor(diff/86400000);
+    const h=Math.floor(diff/3600000)%24;
+    const m=Math.floor(diff/60000)%60;
+    const s=Math.floor(diff/1000)%60;
+
+    timer.textContent = `${d}d ${h}h ${m}m ${s}s`;
+  }
+
+}
+
+setInterval(updateCountdown,1000);
+updateCountdown();
+
+
+// ===== PHASE 2 =====
+function start20SecondCountdown(){
+
+  const music = document.getElementById('bgMusic');
+
+  // 🎵 START MUSIC HERE
+  if(!musicStarted){
+    music.play().catch(()=>{});
+    musicStarted = true;
+  }
+
+  screen.style.opacity = 1;
+
+  title.textContent = "Draw will start in 20 seconds";
+
+  let seconds = 20;
+
+  timer.textContent = seconds;
+
+  const interval = setInterval(()=>{
+
+    seconds--;
+    timer.textContent = seconds;
+
+    if(seconds <= 0){
+      clearInterval(interval);
+
+      // fade out countdown
+      screen.style.opacity = 0;
+
+      setTimeout(()=>{
+        screen.style.display = 'none';
+
+        // 🚀 REMOVE START BUTTON
+        const btn = document.querySelector('.controls');
+        if(btn) btn.style.display = 'none';
+
+        // 🚀 START DRAW
+        drawNext();
+
+      },1000);
+    }
+
+  },1000);
+
+}
 </script>
 
 </body>
