@@ -39,9 +39,10 @@ th,td{padding:10px;border:1px solid #ddd;text-align:center;}
 <div class="container">
 <h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
 <div class="controls" id="startControls" style="display:none;">
+<button onclick="downloadPDF()" class="copy-btn">Download PDF for Printing</button>
 <button onclick="drawNext()">Start Draw Manually</button>
 </div>
-
+<div id="messageOverlay"></div>
 <div class="wheels">
 <div class="wheel"><div>Player</div><div id="playerWheel" class="value">—</div></div>
 <div class="wheel"><div>Pot A</div><div id="potAWheel" class="value">—</div></div>
@@ -138,7 +139,47 @@ function start20() {
 
 function drawNext() {
   if (drawing || !players.length) return;
-  
+  // Function to handle the end sequence
+function showEndSequence() {
+  const msg = document.getElementById('messageOverlay');
+  msg.style.display = 'flex';
+
+  // 1. Fade in "Draw Complete"
+  setTimeout(() => {
+    msg.textContent = "Draw Complete";
+    msg.style.opacity = "1";
+  }, 100);
+
+  // 2. Fade out "Draw Complete" after 5s
+  setTimeout(() => { msg.style.opacity = "0"; }, 5000);
+
+  // 3. Fade in "Thanks for participating..."
+  setTimeout(() => {
+    msg.textContent = "Thanks for participating and good luck!";
+    msg.style.opacity = "1";
+  }, 6000);
+
+  // 4. Final fade out and return to table
+  setTimeout(() => { msg.style.opacity = "0"; }, 11000);
+  setTimeout(() => { msg.style.display = "none"; }, 12000);
+  if (players.length > 0) {
+    drawNext();
+} else {
+    setTimeout(showEndSequence, 1000); 
+}
+
+// Function to generate PDF
+function downloadPDF() {
+  const element = document.querySelector('table');
+  const opt = {
+    margin:       1,
+    filename:     'World_Cup_Sweepstake_Results.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2 },
+    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(element).save();
+}
   const music = document.getElementById('bgMusic');
   if(!musicStarted) { 
     music.play().catch(e=>console.log("Music blocked until click")); 
@@ -197,5 +238,15 @@ function drawNext() {
       });
 }
 </script>
+  <script src="https://cloudflare.com"></script>
+<style>
+  #messageOverlay {
+    display:none; position:fixed; inset:0; background:black; z-index:10001;
+    color:#ffd700; flex-direction:column; justify-content:center;
+    align-items:center; text-align:center; opacity:0; transition:opacity 1s ease;
+    font-size: 60px; font-weight: bold;
+  }
+  .copy-btn { background: #0b3a75; color: white; margin-top: 10px; }
+</style>
 </body>
 </html>
