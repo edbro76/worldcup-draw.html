@@ -224,15 +224,15 @@ function start20(){
 }
 
 // ===== DATA =====
-const playersSeed=[/* unchanged */];
-const potASeed=[/* unchanged */];
-const potBSeed=[/* unchanged */];
+const playersSeed=['Audrey','Ed','Liz','Andy','Carys','Mike','Steve B','Mary','June','Ray','Ian M','Margaret M','Jean','Elaine','Trevor','Sheila','Dave','Roy 1','Roy 2','Maria','Gill','Len','Fiona','Craig'];
+const potASeed=['Argentina','Spain','France','England','Portugal','Brazil','Netherlands','Belgium','Germany','Croatia','Morocco','Colombia','Uruguay','Mexico','USA','Switzerland','Senegal','Japan','Iran','South Korea','Australia','Austria','Norway','Canada'];
+const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arabia','Qatar','Tunisia','Turkey','Czech Republic','Scotland','Sweden','South Africa','New Zealand','Panama','Haiti','Curaçao','Cape Verde','Jordan','Uzbekistan','Iraq','Ecuador','DR Congo','Bosnia & Herzegovina'];
 
 let players=[...playersSeed], potA=[...potASeed], potB=[...potBSeed];
 let count=0, drawing=false, paused=false, musicStarted=false;
 
 // FLAGS
-const flags={/* unchanged */};
+const flags={ "Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng","Portugal":"pt","Brazil":"br","Netherlands":"nl","Belgium":"be","Germany":"de","Croatia":"hr","Morocco":"ma","Colombia":"co","Uruguay":"uy","Mexico":"mx","USA":"us","Switzerland":"ch","Senegal":"sn","Japan":"jp","Iran":"ir","South Korea":"kr","Australia":"au","Austria":"at","Norway":"no","Canada":"ca","Paraguay":"py","Algeria":"dz","Egypt":"eg","Ghana":"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa","Qatar":"qa","Tunisia":"tn","Turkey":"tr","Czech Republic":"cz","Scotland":"gb-sct","Sweden":"se","South Africa":"za","New Zealand":"nz","Panama":"pa","Haiti":"ht","Curaçao":"cw","Cape Verde":"cv","Jordan":"jo","Uzbekistan":"uz","Iraq":"iq","Ecuador":"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba" };
 
 function randomItem(a){return a[Math.floor(Math.random()*a.length)]}
 
