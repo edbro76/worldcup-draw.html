@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cerro Gordo World Cup Sweepstake Live Draw</title>
 
-<!-- PDF Library - Ensure this is at the TOP -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<!-- PDF Library -->
+<script src="https://cloudflare.com"></script>
 
 <style>
-body{font-family:Arial;background:#2b2b2b;margin:0;padding:20px}
+body{font-family:Arial, sans-serif;background:#2b2b2b;margin:0;padding:20px}
 .container{max-width:1200px;margin:auto}
 h1,h2{text-align:center;color:white}
 .controls{display:flex;justify-content:center;gap:15px;margin:20px 0;}
@@ -18,7 +18,7 @@ button{padding:12px 24px;border:none;border-radius:10px;cursor:pointer;backgroun
 .wheel{background:white;padding:25px 40px;border-radius:20px;text-align:center;min-width:220px;}
 .value{font-size:30px;font-weight:bold;color:#0b3a75}
 table{width:100%;border-collapse:collapse;background:white}
-th,td{padding:10px;border:1px solid #ddd;text-align:center;}
+th,td{padding:12px;border:1px solid #ddd;text-align:center;}
 
 #resultFlash{
   display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);
@@ -27,9 +27,8 @@ th,td{padding:10px;border:1px solid #ddd;text-align:center;}
 }
 #flashPlayer{font-size:100px;color:#ffd700;margin-bottom:20px;transition:opacity 0.5s;}
 .flashRow{display:flex;align-items:center;justify-content:center;gap:20px;font-size:60px;margin:10px 0;transition:opacity 0.5s;}
-
-.flag-box { font-size: 80px; line-height: 1; display: flex; align-items: center; justify-content: center; min-width: 140px; }
-.flag-box img { height: 80px; border-radius: 5px; border: 1px solid #444; }
+.flag-box { display: flex; align-items: center; justify-content: center; min-width: 140px; }
+.flag-box img { height: 85px; width: auto; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid #444; }
 
 #countdownScreen{
   position:fixed;inset:0;background:#000;color:#ffd700;
@@ -37,39 +36,28 @@ th,td{padding:10px;border:1px solid #ddd;text-align:center;}
   align-items:center;z-index:10000;text-align:center;transition:opacity 1s;
 }
 
-/* BIGGER ENDING COMMENTS STYLE */
 #messageOverlay {
   display:none; position:fixed; inset:0; background:black; z-index:10001;
   color:#ffd700; flex-direction:column; justify-content:center;
-  align-items:center; text-align:center; opacity:0; transition:opacity 1s ease;
-  font-size: 90px; /* Increased from 60px */
-  font-weight: bold;
-  padding: 50px;
+  align-items:center; text-align:center; opacity:0; transition:opacity 1.5s ease;
+  font-size: 90px; font-weight: bold; padding: 50px;
 }
-
-/* Initially hide PDF button container */
 #finalControls { display: none; margin-top: 20px; }
 </style>
 </head>
 
-<body>
-
+<body onclick="enableAudio()">
 <div class="container">
   <h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
-  
-  <!-- PDF Button only shows at the very end -->
   <div class="controls" id="finalControls">
     <button onclick="downloadPDF()" style="background:#0b3a75; color:white; font-size: 20px;">Download Final Results PDF</button>
   </div>
-
   <div id="messageOverlay"></div>
-
   <div class="wheels">
     <div class="wheel"><div>Player</div><div id="playerWheel" class="value">—</div></div>
     <div class="wheel"><div>Pot A</div><div id="potAWheel" class="value">—</div></div>
     <div class="wheel"><div>Pot B</div><div id="potBWheel" class="value">—</div></div>
   </div>
-
   <h2>Draw Table (<span id="progress">0</span>/24)</h2>
   <table id="resultsTable">
     <thead><tr><th>#</th><th>Player</th><th>Pot A</th><th>Pot B</th></tr></thead>
@@ -80,24 +68,18 @@ th,td{padding:10px;border:1px solid #ddd;text-align:center;}
 <div id="countdownScreen">
   <div id="countdownStatus" style="font-size:60px;margin-bottom:20px;">Draw Starts In</div>
   <div id="countdownTimer" style="font-size:90px;"></div>
+  <div style="font-size:20px; margin-top:20px; color:#aaa;">(Click anywhere to enable music)</div>
 </div>
 
 <div id="resultFlash">
   <div id="flashPlayer"></div>
-  <div id="flashRowA" class="flashRow">
-    <div class="flag-box" id="boxA"><img id="flagA"></div>
-    <div id="flashPotA"></div>
-  </div>
-  <div id="flashRowB" class="flashRow">
-    <div class="flag-box" id="boxB"><img id="flagB"></div>
-    <div id="flashPotB"></div>
-  </div>
+  <div id="flashRowA" class="flashRow"><div class="flag-box"><img id="flagA"></div><div id="flashPotA"></div></div>
+  <div id="flashRowB" class="flashRow"><div class="flag-box"><img id="flagB"></div><div id="flashPotB"></div></div>
 </div>
 
 <audio id="bgMusic" loop><source src="themetune.mp3" type="audio/mpeg"></audio>
 
 <script>
-// ===== SETUP =====
 const drawDate = new Date(Date.now() + 10000); 
 let phase = 1, musicStarted = false, count = 0, drawing = false;
 
@@ -110,59 +92,29 @@ const flags = {"Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng","P
 
 function randomItem(a) { return a[Math.floor(Math.random() * a.length)]; }
 
-function getEmoji(code) {
-  if (!code) return "🚩";
-  if (code === 'gb-eng') return "🏴󠁧󠁢󠁥󠁮󠁧󠁿";
-  if (code === 'gb-sct') return "🏴󠁧󠁢󠁳󠁣󠁴󠁿";
-  return code.toUpperCase().replace(/./g, char => String.fromCodePoint(char.charCodeAt(0) + 127397));
+function enableAudio() {
+  const music = document.getElementById('bgMusic');
+  if(!musicStarted && phase >= 1) { 
+    music.play().catch(e => {}); 
+    musicStarted = true; 
+  }
 }
 
-// Improved PDF Download Logic
 function downloadPDF() {
   const element = document.getElementById('resultsTable');
-  const opt = { 
-    margin: 0.5, 
-    filename: 'Sweepstake_Results.pdf', 
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true }, 
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } 
-  };
-  
-  // New safe execution pattern for html2pdf
-  if (typeof html2pdf !== 'undefined') {
-    html2pdf().set(opt).from(element).save().catch(err => {
-      console.error("PDF generation failed:", err);
-      alert("There was an error creating your PDF. Please try again.");
-    });
-  } else {
-    alert("PDF library is still loading. Please wait a moment.");
-  }
+  const opt = { margin: 0.5, filename: 'Sweepstake_Results.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
+  if (typeof html2pdf !== 'undefined') html2pdf().set(opt).from(element).save();
 }
 
 function showEndSequence() {
   const msg = document.getElementById('messageOverlay');
   const finalBtn = document.getElementById('finalControls');
-  
   msg.style.display = 'flex';
-  
-  // 1. Fade in "Draw Complete"
   setTimeout(() => { msg.textContent = "Draw Complete"; msg.style.opacity = "1"; }, 100);
-  
-  // 2. Fade out "Draw Complete" after 5s
   setTimeout(() => { msg.style.opacity = "0"; }, 5000);
-  
-  // 3. Fade in "Thanks for participating..."
-  setTimeout(() => { 
-    msg.textContent = "Thanks for participating and good luck!"; 
-    msg.style.opacity = "1"; 
-  }, 6100);
-  
-  // 4. Final fade out, hide overlay, and SHOW PDF BUTTON
+  setTimeout(() => { msg.textContent = "Thanks for participating and good luck!"; msg.style.opacity = "1"; }, 6100);
   setTimeout(() => { msg.style.opacity = "0"; }, 11100);
-  setTimeout(() => { 
-    msg.style.display = "none";
-    finalBtn.style.display = "flex"; // Show the button now
-  }, 12100);
+  setTimeout(() => { msg.style.display = "none"; finalBtn.style.display = "flex"; }, 12100);
 }
 
 function spin(id, arr, finalValue, cb) {
@@ -173,8 +125,7 @@ function spin(id, arr, finalValue, cb) {
   }, 100);
 }
 
-// ===== TIMERS =====
-const timerInterval = setInterval(() => {
+setInterval(() => {
   if (phase === 1) {
     const diff = drawDate - Date.now();
     if (diff <= 0) { phase = 2; start20(); return; }
@@ -183,8 +134,7 @@ const timerInterval = setInterval(() => {
 }, 100);
 
 function start20() {
-  const music = document.getElementById('bgMusic');
-  if(!musicStarted) { music.play().catch(e => {}); musicStarted = true; }
+  enableAudio();
   document.getElementById('countdownStatus').textContent = "Final Countdown...";
   let sec = 20;
   let i = setInterval(() => {
@@ -198,52 +148,29 @@ function start20() {
   }, 1000);
 }
 
-// ===== DRAW =====
 function drawNext() {
   if (drawing || !players.length) return;
   drawing = true;
   document.getElementById('resultFlash').style.display = 'none';
   let p = randomItem(players), a = randomItem(potA), b = randomItem(potB);
-
   spin('playerWheel', players, p, () => {
     spin('potAWheel', potA, a, () => {
       spin('potBWheel', potB, b, () => {
-        players = players.filter(x => x !== p);
-        potA = potA.filter(x => x !== a);
-        potB = potB.filter(x => x !== b);
+        players = players.filter(x => x !== p); potA = potA.filter(x => x !== a); potB = potB.filter(x => x !== b);
         count++;
         document.getElementById('resultsBody').insertAdjacentHTML('beforeend', `<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`);
         document.getElementById('progress').textContent = count;
-
         const fP = document.getElementById('flashPlayer'), fRA = document.getElementById('flashRowA'), fRB = document.getElementById('flashRowB');
-        const imgA = document.getElementById('flagA'), imgB = document.getElementById('flagB');
-        const boxA = document.getElementById('boxA'), boxB = document.getElementById('boxB');
-
         fP.style.opacity = "0"; fRA.style.opacity = "0"; fRB.style.opacity = "0";
-        fP.textContent = p;
-        document.getElementById('flashPotA').textContent = a;
-        document.getElementById('flashPotB').textContent = b;
-
-        // Reset display
-        imgA.style.display = 'block'; boxA.querySelector('span')?.remove();
-        imgB.style.display = 'block'; boxB.querySelector('span')?.remove();
-
-        const codeA = flags[a], codeB = flags[b];
-        imgA.src = `https://flagcdn.com{codeA}.png`;
-        imgB.src = `https://flagcdn.com{codeB}.png`;
-
-        imgA.onerror = () => { imgA.style.display = 'none'; boxA.insertAdjacentHTML('beforeend', `<span>${getEmoji(codeA)}</span>`); };
-        imgB.onerror = () => { imgB.style.display = 'none'; boxB.insertAdjacentHTML('beforeend', `<span>${getEmoji(codeB)}</span>`); };
-
+        fP.textContent = p; document.getElementById('flashPotA').textContent = a; document.getElementById('flashPotB').textContent = b;
+        document.getElementById('flagA').src = `https://flagcdn.com{flags[a]}.png`;
+        document.getElementById('flagB').src = `https://flagcdn.com{flags[b]}.png`;
         const flash = document.getElementById('resultFlash');
         flash.style.display = 'flex';
         setTimeout(() => flash.style.opacity = '1', 50);
-
-        // Timings (snappy 0.8s reveals)
         setTimeout(() => { fP.style.opacity = "1"; }, 1000); 
         setTimeout(() => { fRA.style.opacity = "1"; }, 1800); 
         setTimeout(() => { fRB.style.opacity = "1"; }, 2600); 
-
         setTimeout(() => {
           flash.style.opacity = '0';
           setTimeout(() => {
