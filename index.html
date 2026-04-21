@@ -392,7 +392,7 @@ text+=`${c[0].innerText}. ${c[1].innerText} - ${c[2].innerText} / ${c[3].innerTe
 navigator.clipboard.writeText(text);
 }
 // 🎯 MAIN DRAW DATE
-const drawDate = new Date("2026-05-24T19:00:00");
+const drawDate = new Date(Date.now() + 10000);
 
 let phase = 1; // 1 = main countdown, 2 = 20 sec countdown
 
