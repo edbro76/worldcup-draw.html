@@ -157,6 +157,12 @@ function start20() {
 }
 
 // ===== THE DRAW =====
+  function getFlagCode(countryName) {
+  // Convert the input name to a format that matches your flags object keys
+  // Assuming your flags keys are currently like {Argentina: "ar", ...}
+  const key = Object.keys(flags).find(k => k.toLowerCase() === countryName.toLowerCase());
+  return key ? flags[key].toLowerCase() : null;
+}
 function drawNext() {
   if (drawing || !players.length) return;
   
@@ -185,16 +191,30 @@ function drawNext() {
 
         // Set Content
         fP.textContent = p;
-        document.getElementById('flashPotA').textContent = a;
-        document.getElementById('flashPotB').textContent = b;
+document.getElementById('flashPotA').textContent = a;
+document.getElementById('flashPotB').textContent = b;
 
-        // FIXED: Ensure flag codes are lowercase and use a reliable width parameter (w80)
-        // Check documentation at [Flagcdn.com](https://flagcdn.com/)
-        const codeA = flags[a] ? flags[a].toLowerCase() : 'unknown';
-        const codeB = flags[b] ? flags[b].toLowerCase() : 'unknown';
-        
-        document.getElementById('flagA').src = `https://flagcdn.com{codeA}.png`;
-        document.getElementById('flagB').src = `https://flagcdn.com{codeB}.png`;
+// Use the new helper to find codes
+const codeA = getFlagCode(a);
+const codeB = getFlagCode(b);
+
+// Set image source if code is found, otherwise hide/use placeholder
+const flagAImg = document.getElementById('flagA');
+const flagBImg = document.getElementById('flagB');
+
+if (codeA) {
+  flagAImg.src = `https://flagcdn.com{codeA}.png`;
+  flagAImg.style.display = 'block';
+} else {
+  flagAImg.style.display = 'none'; // Hide if flag not found
+}
+
+if (codeB) {
+  flagBImg.src = `https://flagcdn.com{codeB}.png`;
+  flagBImg.style.display = 'block';
+} else {
+  flagBImg.style.display = 'none';
+}
 
         // Show Overlay
         const flash = document.getElementById('resultFlash');
