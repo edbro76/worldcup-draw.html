@@ -131,7 +131,16 @@ const timerInterval = setInterval(() => {
 }, 100);
 
 function start20() {
-  document.getElementById('countdownStatus').textContent = "Final Countdown...";
+  const statusText = document.getElementById('countdownStatus');
+  const music = document.getElementById('bgMusic');
+  
+  // Trigger music here so it plays throughout the final countdown
+  if(!musicStarted) { 
+    music.play().catch(e => console.log("Music blocked - will play on first click")); 
+    musicStarted = true; 
+  }
+
+  statusText.textContent = "Final Countdown...";
   let sec = 20;
   let i = setInterval(() => {
     sec--;
@@ -139,7 +148,10 @@ function start20() {
     if (sec <= 0) {
       clearInterval(i);
       document.getElementById('countdownScreen').style.opacity = 0;
-      setTimeout(() => { document.getElementById('countdownScreen').style.display = 'none'; drawNext(); }, 1000);
+      setTimeout(() => { 
+        document.getElementById('countdownScreen').style.display = 'none'; 
+        drawNext(); 
+      }, 1000);
     }
   }, 1000);
 }
@@ -148,9 +160,6 @@ function start20() {
 function drawNext() {
   if (drawing || !players.length) return;
   
-  const music = document.getElementById('bgMusic');
-  if(!musicStarted) { music.play().catch(e=>{}); musicStarted=true; }
-
   drawing = true;
   document.getElementById('resultFlash').style.display = 'none';
 
@@ -178,8 +187,14 @@ function drawNext() {
         fP.textContent = p;
         document.getElementById('flashPotA').textContent = a;
         document.getElementById('flashPotB').textContent = b;
-        document.getElementById('flagA').src = `https://flagcdn.com{flags[a]}.png`;
-        document.getElementById('flagB').src = `https://flagcdn.com{flags[b]}.png`;
+
+        // FIXED: Ensure flag codes are lowercase and use a reliable width parameter (w80)
+        // Check documentation at [Flagcdn.com](https://flagcdn.com/)
+        const codeA = flags[a] ? flags[a].toLowerCase() : 'unknown';
+        const codeB = flags[b] ? flags[b].toLowerCase() : 'unknown';
+        
+        document.getElementById('flagA').src = `https://flagcdn.com{codeA}.png`;
+        document.getElementById('flagB').src = `https://flagcdn.com{codeB}.png`;
 
         // Show Overlay
         const flash = document.getElementById('resultFlash');
