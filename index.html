@@ -355,10 +355,29 @@ function showComplete(){
   document.getElementById('potBWheel').textContent='—';
 }
 // PAUSE
-document.addEventListener('contextmenu',e=>{
-e.preventDefault();
-paused=!paused;
-if(!paused) drawNext();
+// PAUSE / RESUME
+document.addEventListener('contextmenu', e=>{
+  e.preventDefault();
+  if(drawing) return;
+
+  paused=!paused;
+  const flash=document.getElementById('resultFlash');
+
+  if(paused){
+    document.getElementById('flashPlayer').textContent='⏸ PAUSED';
+    document.getElementById('flashPotA').textContent='Right click to resume';
+    document.getElementById('flashPotB').textContent='';
+    flash.style.display='flex';
+    flash.style.opacity='1';
+  }else{
+    flash.style.opacity='0';
+    setTimeout(()=>{
+      flash.style.display='none';
+      if(players.length>0){
+        drawNext();
+      }
+    },500);
+  }
 });
 
 // RESET
