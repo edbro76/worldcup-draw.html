@@ -237,54 +237,78 @@ function spin(id, arr, finalValue, duration = 3000, cb){
 }
 // DRAW
 function drawNext(){
-if(paused||drawing||!players.length)return;
 
-['playerWheel','potAWheel','potBWheel'].forEach(id=>document.getElementById(id).textContent='—');
+  if(paused || drawing || !players.length) return;
 
-let music=document.getElementById('bgMusic');
-if(!musicStarted){music.play();musicStarted=true;}
+  // clear wheels
+  document.getElementById('playerWheel').textContent='—';
+  document.getElementById('potAWheel').textContent='—';
+  document.getElementById('potBWheel').textContent='—';
 
-drawing=true;
+  let music=document.getElementById('bgMusic');
+  if(!musicStarted){
+    music.play().catch(()=>{});
+    musicStarted=true;
+  }
 
-let p=rand(players),a=rand(potA),b=rand(potB);
+  drawing = true;
 
-spin('playerWheel', players, p, 3000, ()=>{
-  spin('potAWheel', potA, a, 3000, ()=>{
-    spin('potBWheel', potB, b, 3000, ()=>{
+  let p = rand(players);
+  let a = rand(potA);
+  let b = rand(potB);
 
-      players = players.filter(x=>x!==p);
-      potA = potA.filter(x=>x!==a);
-      potB = potB.filter(x=>x!==b);
-      count++;
+  // 🎡 SPIN SEQUENCE
+  spin('playerWheel', players, p, 3000, ()=>{
+    spin('potAWheel', potA, a, 3000, ()=>{
+      spin('potBWheel', potB, b, 3000, ()=>{
 
-      resultsBody.innerHTML += `<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`;
-      progress.textContent = count;
+        // remove drawn items
+        players = players.filter(x=>x!==p);
+        potA = potA.filter(x=>x!==a);
+        potB = potB.filter(x=>x!==b);
 
-      // FLASH
-      flashPlayer.textContent = p;
-      flashPotA.textContent = a;
-      flashPotB.textContent = b;
+        count++;
 
-      flagA.src = `https://flagcdn.com/w80/${flags[a]}.png`;
-      flagB.src = `https://flagcdn.com/w80/${flags[b]}.png`;
+        // update table
+        resultsBody.innerHTML += `<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`;
+        progress.textContent = count;
 
-      let f = resultFlash;
-      f.style.display = 'flex';
-      setTimeout(()=>f.style.opacity=1,50);
+        // FLASH
+        flashPlayer.textContent = p;
+        flashPotA.textContent = a;
+        flashPotB.textContent = b;
 
-      drawing = false;
+        flagA.src = `https://flagcdn.com/w80/${flags[a]}.png`;
+        flagB.src = `https://flagcdn.com/w80/${flags[b]}.png`;
 
-      setTimeout(()=>{
-        f.style.opacity=0;
+        let f = resultFlash;
+        f.style.display='flex';
+        setTimeout(()=>f.style.opacity=1,50);
+
+        drawing = false;
+
+        // hide flash
         setTimeout(()=>{
-          f.style.display='none';
-          if(players.length) drawNext(); else showComplete();
-        },1000);
-      },3000);
+          f.style.opacity=0;
 
+          setTimeout(()=>{
+            f.style.display='none';
+
+            if(players.length){
+              drawNext();
+            } else {
+              showComplete();
+            }
+
+          },1000);
+
+        },3000);
+
+      });
     });
   });
-});
+
+}
 
 players=players.filter(x=>x!==p);
 potA=potA.filter(x=>x!==a);
