@@ -235,33 +235,62 @@ function spin(id, arr, finalValue, cb){
 }
 // DRAW
 function drawNext(){
-if(paused||drawing||!players.length)return;
+  if(paused || drawing || !players.length) return;
 
-['playerWheel','potAWheel','potBWheel'].forEach(id=>document.getElementById(id).textContent='—');
+  document.getElementById('resultFlash').style.display='none';
 
-let music=document.getElementById('bgMusic');
-if(!musicStarted){music.play();musicStarted=true;}
+  ['playerWheel','potAWheel','potBWheel'].forEach(id=>document.getElementById(id).textContent='—');
 
-drawing=true;
+  let music=document.getElementById('bgMusic');
+  if(!musicStarted){music.play();musicStarted=true;}
 
-let p=rand(players),a=rand(potA),b=rand(potB);
+  drawing=true;
 
-setTimeout(()=>{
-document.getElementById('playerWheel').textContent=p;
+  let p=randomItem(players), a=randomItem(potA), b=randomItem(potB);
 
-setTimeout(()=>{
-document.getElementById('potAWheel').textContent=a;
+  spin('playerWheel',players,p,()=>{
+    spin('potAWheel',potA,a,()=>{
+      spin('potBWheel',potB,b,()=>{
 
-setTimeout(()=>{
-document.getElementById('potBWheel').textContent=b;
+        players=players.filter(x=>x!==p);
+        potA=potA.filter(x=>x!==a);
+        potB=potB.filter(x=>x!==b);
+        count++;
 
-players=players.filter(x=>x!==p);
-potA=potA.filter(x=>x!==a);
-potB=potB.filter(x=>x!==b);
-count++;
+        document.getElementById('resultsBody').insertAdjacentHTML('beforeend',
+          `<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`);
 
-resultsBody.innerHTML+=`<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`;
-progress.textContent=count;
+        document.getElementById('progress').textContent=count;
+
+        document.getElementById('flashPlayer').textContent=p;
+        document.getElementById('flashPotA').textContent=a;
+        document.getElementById('flashPotB').textContent=b;
+
+        document.getElementById('flagA').src=`https://flagcdn.com/w80/${flags[a]}.png`;
+        document.getElementById('flagB').src=`https://flagcdn.com/w80/${flags[b]}.png`;
+
+        const flash=document.getElementById('resultFlash');
+        flash.style.display='flex';
+        setTimeout(()=>flash.style.opacity='1',50);
+
+        drawing=false;
+
+        setTimeout(()=>{
+          flash.style.opacity='0';
+          setTimeout(()=>{
+            flash.style.display='none';
+            if(players.length>0){
+              drawNext();
+            }else{
+              showComplete();
+            }
+          },1000);
+        },3000);
+
+      });
+    });
+  });
+}
 
 // FLASH
 flashPlayer.textContent=p;
