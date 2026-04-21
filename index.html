@@ -5,12 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cerro Gordo World Cup Sweepstake Live Draw</title>
 
+<!-- PDF Library -->
+<script src="https://cloudflare.com"></script>
+
 <style>
 body{font-family:Arial;background:#2b2b2b;margin:0;padding:20px}
 .container{max-width:1200px;margin:auto}
 h1,h2{text-align:center;color:white}
 .controls{display:flex;justify-content:center;gap:15px;margin:20px 0;}
-button{padding:12px 24px;border:none;border-radius:10px;cursor:pointer;background:#ffd700;font-weight:bold;}
+button{padding:12px 24px;border:none;border-radius:10px;cursor:pointer;background:#ffd700;font-weight:bold;color:black;}
 .wheels{display:flex;justify-content:center;gap:30px;margin:30px 0;}
 .wheel{background:white;padding:25px 40px;border-radius:20px;text-align:center;min-width:220px;}
 .value{font-size:30px;font-weight:bold;color:#0b3a75}
@@ -22,8 +25,8 @@ th,td{padding:10px;border:1px solid #ddd;text-align:center;}
   z-index:9999;color:white;flex-direction:column;justify-content:center;
   align-items:center;text-align:center;opacity:0;transition:opacity 1s ease;
 }
-#flashPlayer{font-size:100px;color:#ffd700;margin-bottom:30px;}
-.flashRow{display:flex;align-items:center;justify-content:center;gap:20px;font-size:60px;margin:10px 0;}
+#flashPlayer{font-size:100px;color:#ffd700;margin-bottom:30px;transition:opacity 0.5s;}
+.flashRow{display:flex;align-items:center;justify-content:center;gap:20px;font-size:60px;margin:10px 0;transition:opacity 0.5s;}
 .flashRow img{height:80px;border-radius:5px;}
 
 #countdownScreen{
@@ -31,31 +34,41 @@ th,td{padding:10px;border:1px solid #ddd;text-align:center;}
   display:flex;flex-direction:column;justify-content:center;
   align-items:center;z-index:10000;text-align:center;transition:opacity 1s;
 }
+
+#messageOverlay {
+  display:none; position:fixed; inset:0; background:black; z-index:10001;
+  color:#ffd700; flex-direction:column; justify-content:center;
+  align-items:center; text-align:center; opacity:0; transition:opacity 1s ease;
+  font-size: 60px; font-weight: bold;
+}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-<h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
-<div class="controls" id="startControls" style="display:none;">
-<button onclick="downloadPDF()" class="copy-btn">Download PDF for Printing</button>
-<button onclick="drawNext()">Start Draw Manually</button>
-</div>
-<div id="messageOverlay"></div>
-<div class="wheels">
-<div class="wheel"><div>Player</div><div id="playerWheel" class="value">—</div></div>
-<div class="wheel"><div>Pot A</div><div id="potAWheel" class="value">—</div></div>
-<div class="wheel"><div>Pot B</div><div id="potBWheel" class="value">—</div></div>
+  <h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
+  <div class="controls" id="startControls">
+    <button onclick="drawNext()">Start Draw Manually</button>
+    <button onclick="downloadPDF()" style="background:#0b3a75; color:white;">Download PDF</button>
+  </div>
+
+  <div id="messageOverlay"></div>
+
+  <div class="wheels">
+    <div class="wheel"><div>Player</div><div id="playerWheel" class="value">—</div></div>
+    <div class="wheel"><div>Pot A</div><div id="potAWheel" class="value">—</div></div>
+    <div class="wheel"><div>Pot B</div><div id="potBWheel" class="value">—</div></div>
+  </div>
+
+  <h2>Draw Table (<span id="progress">0</span>/24)</h2>
+  <table id="resultsTable">
+    <thead><tr><th>#</th><th>Player</th><th>Pot A</th><th>Pot B</th></tr></thead>
+    <tbody id="resultsBody"></tbody>
+  </table>
 </div>
 
-<h2>Draw Table (<span id="progress">0</span>/24)</h2>
-<table>
-<thead><tr><th>#</th><th>Player</th><th>Pot A</th><th>Pot B</th></tr></thead>
-<tbody id="resultsBody"></tbody>
-</table>
-</div>
-
+<!-- SCREENS -->
 <div id="countdownScreen">
   <div id="countdownStatus" style="font-size:60px;margin-bottom:20px;">Draw Starts In</div>
   <div id="countdownTimer" style="font-size:90px;"></div>
@@ -63,190 +76,135 @@ th,td{padding:10px;border:1px solid #ddd;text-align:center;}
 
 <div id="resultFlash">
   <div id="flashPlayer"></div>
-  <div class="flashRow"><img id="flagA"><div id="flashPotA"></div></div>
-  <div class="flashRow"><img id="flagB"><div id="flashPotB"></div></div>
+  <div id="flashRowA" class="flashRow"><img id="flagA"><div id="flashPotA"></div></div>
+  <div id="flashRowB" class="flashRow"><img id="flagB"><div id="flashPotB"></div></div>
 </div>
 
 <audio id="bgMusic" loop><source src="themetune.mp3" type="audio/mpeg"></audio>
 
 <script>
-// ===== CONFIG & STATE =====
-const drawDate = new Date(Date.now() + 10000); // 10s for testing
-let phase = 1;
-let musicStarted = false;
-let count = 0;
-let drawing = false;
+// ===== DATA & STATE =====
+const drawDate = new Date(Date.now() + 10000); 
+let phase = 1, musicStarted = false, count = 0, drawing = false;
 
 const playersSeed=['Audrey','Ed','Liz','Andy','Carys','Mike','Steve B','Mary','June','Ray','Ian M','Margaret M','Jean','Elaine','Trevor','Sheila','Dave','Roy 1','Roy 2','Maria','Gill','Len','Fiona','Craig'];
 const potASeed=['Argentina','Spain','France','England','Portugal','Brazil','Netherlands','Belgium','Germany','Croatia','Morocco','Colombia','Uruguay','Mexico','USA','Switzerland','Senegal','Japan','Iran','South Korea','Australia','Austria','Norway','Canada'];
 const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arabia','Qatar','Tunisia','Turkey','Czech Republic','Scotland','Sweden','South Africa','New Zealand','Panama','Haiti','Curaçao','Cape Verde','Jordan','Uzbekistan','Iraq','Ecuador','DR Congo','Bosnia & Herzegovina'];
 
 let players = [...playersSeed], potA = [...potASeed], potB = [...potBSeed];
-
 const flags={Argentina:"ar",Spain:"es",France:"fr",England:"gb-eng",Portugal:"pt",Brazil:"br",Netherlands:"nl",Belgium:"be",Germany:"de",Croatia:"hr",Morocco:"ma",Colombia:"co",Uruguay:"uy",Mexico:"mx",USA:"us",Switzerland:"ch",Senegal:"sn",Japan:"jp",Iran:"ir","South Korea":"kr",Australia:"au",Austria:"at",Norway:"no",Canada:"ca",Paraguay:"py",Algeria:"dz",Egypt:"eg",Ghana:"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa",Qatar:"qa",Tunisia:"tn",Turkey:"tr","Czech Republic":"cz",Scotland:"gb-sct",Sweden:"se","South Africa":"za","New Zealand":"nz",Panama:"pa",Haiti:"ht","Curaçao":"cw","Cape Verde":"cv",Jordan:"jo",Uzbekistan:"uz",Iraq:"iq",Ecuador:"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"};
-
-const screen = document.getElementById('countdownScreen');
-const timer = document.getElementById('countdownTimer');
-const statusText = document.getElementById('countdownStatus');
 
 // ===== UTILS =====
 function randomItem(a) { return a[Math.floor(Math.random() * a.length)]; }
+
+function downloadPDF() {
+  const element = document.getElementById('resultsTable');
+  const opt = { margin: 1, filename: 'Sweepstake_Results.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
+  html2pdf().set(opt).from(element).save();
+}
+
+function showEndSequence() {
+  const msg = document.getElementById('messageOverlay');
+  msg.style.display = 'flex';
+  setTimeout(() => { msg.textContent = "Draw Complete"; msg.style.opacity = "1"; }, 100);
+  setTimeout(() => { msg.style.opacity = "0"; }, 5000);
+  setTimeout(() => { msg.textContent = "Thanks for participating and good luck!"; msg.style.opacity = "1"; }, 6000);
+  setTimeout(() => { msg.style.opacity = "0"; }, 11000);
+  setTimeout(() => { msg.style.display = "none"; }, 12000);
+}
 
 function spin(id, arr, finalValue, cb) {
   let t = 0, el = document.getElementById(id);
   let i = setInterval(() => {
     el.textContent = randomItem(arr);
-    if (++t >= 20) { 
-      clearInterval(i);
-      el.textContent = finalValue;
-      if (cb) cb();
-    }
+    if (++t >= 20) { clearInterval(i); el.textContent = finalValue; if (cb) cb(); }
   }, 100);
 }
 
-// ===== CORE LOGIC =====
+// ===== TIMERS =====
 const timerInterval = setInterval(() => {
   if (phase === 1) {
     const diff = drawDate - Date.now();
-    if (diff <= 0) {
-      phase = 2;
-      start20();
-      return;
-    }
-    const s = Math.floor(diff / 1000);
-    timer.textContent = s + "s";
+    if (diff <= 0) { phase = 2; start20(); return; }
+    document.getElementById('countdownTimer').textContent = Math.floor(diff / 1000) + "s";
   }
 }, 100);
 
 function start20() {
-  statusText.textContent = "Final Countdown...";
+  document.getElementById('countdownStatus').textContent = "Final Countdown...";
   let sec = 20;
-  timer.textContent = sec;
-
   let i = setInterval(() => {
     sec--;
-    timer.textContent = sec;
+    document.getElementById('countdownTimer').textContent = sec;
     if (sec <= 0) {
       clearInterval(i);
-      screen.style.opacity = 0;
-      setTimeout(() => {
-        screen.style.display = 'none';
-        drawNext();
-      }, 1000);
+      document.getElementById('countdownScreen').style.opacity = 0;
+      setTimeout(() => { document.getElementById('countdownScreen').style.display = 'none'; drawNext(); }, 1000);
     }
   }, 1000);
 }
 
+// ===== THE DRAW =====
 function drawNext() {
   if (drawing || !players.length) return;
-  // Function to handle the end sequence
-function showEndSequence() {
-  const msg = document.getElementById('messageOverlay');
-  msg.style.display = 'flex';
-
-  // 1. Fade in "Draw Complete"
-  setTimeout(() => {
-    msg.textContent = "Draw Complete";
-    msg.style.opacity = "1";
-  }, 100);
-
-  // 2. Fade out "Draw Complete" after 5s
-  setTimeout(() => { msg.style.opacity = "0"; }, 5000);
-
-  // 3. Fade in "Thanks for participating..."
-  setTimeout(() => {
-    msg.textContent = "Thanks for participating and good luck!";
-    msg.style.opacity = "1";
-  }, 6000);
-
-  // 4. Final fade out and return to table
-  setTimeout(() => { msg.style.opacity = "0"; }, 11000);
-  setTimeout(() => { msg.style.display = "none"; }, 12000);
-  if (players.length > 0) {
-    drawNext();
-} else {
-    setTimeout(showEndSequence, 1000); 
-}
-
-// Function to generate PDF
-function downloadPDF() {
-  const element = document.querySelector('table');
-  const opt = {
-    margin:       1,
-    filename:     'World_Cup_Sweepstake_Results.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2 },
-    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-  };
-  html2pdf().set(opt).from(element).save();
-}
+  
   const music = document.getElementById('bgMusic');
-  if(!musicStarted) { 
-    music.play().catch(e=>console.log("Music blocked until click")); 
-    musicStarted=true; 
-  }
+  if(!musicStarted) { music.play().catch(e=>{}); musicStarted=true; }
 
   drawing = true;
   document.getElementById('resultFlash').style.display = 'none';
 
   let p = randomItem(players), a = randomItem(potA), b = randomItem(potB);
 
-  spin('potBWheel', potB, b, () => {
+  spin('playerWheel', players, p, () => {
+    spin('potAWheel', potA, a, () => {
+      spin('potBWheel', potB, b, () => {
+        
+        // Update Table
         players = players.filter(x => x !== p);
         potA = potA.filter(x => x !== a);
         potB = potB.filter(x => x !== b);
         count++;
-
-        document.getElementById('resultsBody').insertAdjacentHTML('beforeend', 
-          `<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`);
+        document.getElementById('resultsBody').insertAdjacentHTML('beforeend', `<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`);
         document.getElementById('progress').textContent = count;
 
-        // 1. Prepare data but keep elements hidden initially
-        const flash = document.getElementById('resultFlash');
-        const fPlayer = document.getElementById('flashPlayer');
-        const fRowA = document.querySelector('.flashRow:nth-of-type(2)');
-        const fRowB = document.querySelector('.flashRow:nth-of-type(3)');
-        
-        fPlayer.style.opacity = "0";
-        fRowA.style.opacity = "0";
-        fRowB.style.opacity = "0";
+        // Reset Flash Opacities
+        const fP = document.getElementById('flashPlayer');
+        const fRA = document.getElementById('flashRowA');
+        const fRB = document.getElementById('flashRowB');
+        fP.style.opacity = "0"; fRA.style.opacity = "0"; fRB.style.opacity = "0";
 
-        document.getElementById('flashPlayer').textContent = p;
+        // Set Content
+        fP.textContent = p;
         document.getElementById('flashPotA').textContent = a;
         document.getElementById('flashPotB').textContent = b;
         document.getElementById('flagA').src = `https://flagcdn.com{flags[a]}.png`;
         document.getElementById('flagB').src = `https://flagcdn.com{flags[b]}.png`;
 
-        // 2. Show the black overlay
+        // Show Overlay
+        const flash = document.getElementById('resultFlash');
         flash.style.display = 'flex';
         setTimeout(() => flash.style.opacity = '1', 50);
 
-        // 3. Staggered Reveal (1 second apart)
-        setTimeout(() => { fPlayer.style.opacity = "1"; fPlayer.style.transition = "opacity 0.5s"; }, 1000);
-        setTimeout(() => { fRowA.style.opacity = "1"; fRowA.style.transition = "opacity 0.5s"; }, 2000);
-        setTimeout(() => { fRowB.style.opacity = "1"; fRowB.style.transition = "opacity 0.5s"; }, 3000);
+        // STAGGERED REVEAL
+        setTimeout(() => { fP.style.opacity = "1"; }, 1000);
+        setTimeout(() => { fRA.style.opacity = "1"; }, 2000);
+        setTimeout(() => { fRB.style.opacity = "1"; }, 3000);
 
-        // 4. Close flash screen after reveal is done
+        // Close and Next
         setTimeout(() => {
           flash.style.opacity = '0';
           setTimeout(() => {
             flash.style.display = 'none';
             drawing = false;
-            if (players.length > 0) drawNext();
+            if (players.length > 0) { drawNext(); } 
+            else { showEndSequence(); }
           }, 1000);
-        }, 4000); // Increased total time to allow for the slow reveal
+        }, 7000);
       });
+    });
+  });
 }
 </script>
-  <script src="https://cloudflare.com"></script>
-<style>
-  #messageOverlay {
-    display:none; position:fixed; inset:0; background:black; z-index:10001;
-    color:#ffd700; flex-direction:column; justify-content:center;
-    align-items:center; text-align:center; opacity:0; transition:opacity 1s ease;
-    font-size: 60px; font-weight: bold;
-  }
-  .copy-btn { background: #0b3a75; color: white; margin-top: 10px; }
-</style>
 </body>
 </html>
