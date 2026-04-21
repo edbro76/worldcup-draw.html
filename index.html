@@ -147,7 +147,7 @@ th,td{padding:10px;border:1px solid #ddd}
 <script>
 
 // ===== COUNTDOWN =====
-const drawDate = new Date(Date.now() + 10000);
+const drawDate = new Date("2026-05-24T19:00:00");
 let phase = 1;
 
 const screen = document.getElementById('countdownScreen');
@@ -221,94 +221,28 @@ let count=0, drawing=false, paused=false, musicStarted=false;
 const flags={Argentina:"ar",Spain:"es",France:"fr",England:"gb-eng",Portugal:"pt",Brazil:"br",Netherlands:"nl",Belgium:"be",Germany:"de",Croatia:"hr",Morocco:"ma",Colombia:"co",Uruguay:"uy",Mexico:"mx",USA:"us",Switzerland:"ch",Senegal:"sn",Japan:"jp",Iran:"ir","South Korea":"kr",Australia:"au",Austria:"at",Norway:"no",Canada:"ca",Paraguay:"py",Algeria:"dz",Egypt:"eg",Ghana:"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa",Qatar:"qa",Tunisia:"tn",Turkey:"tr","Czech Republic":"cz",Scotland:"gb-sct",Sweden:"se","South Africa":"za","New Zealand":"nz",Panama:"pa",Haiti:"ht","Curaçao":"cw","Cape Verde":"cv",Jordan:"jo",Uzbekistan:"uz",Iraq:"iq",Ecuador:"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"};
 
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
-function spin(id, arr, finalValue, duration = 3000, cb){
-  const el = document.getElementById(id);
-  let start = Date.now();
 
-  const interval = setInterval(()=>{
-    el.textContent = arr[Math.floor(Math.random()*arr.length)];
-
-    if(Date.now() - start >= duration){
-      clearInterval(interval);
-      el.textContent = finalValue;
-      if(cb) cb();
-    }
-  }, 100);
-}
 // DRAW
 function drawNext(){
+if(paused||drawing||!players.length)return;
 
-  if(paused || drawing || !players.length) return;
+['playerWheel','potAWheel','potBWheel'].forEach(id=>document.getElementById(id).textContent='—');
 
-  // clear wheels
-  document.getElementById('playerWheel').textContent='—';
-  document.getElementById('potAWheel').textContent='—';
-  document.getElementById('potBWheel').textContent='—';
+let music=document.getElementById('bgMusic');
+if(!musicStarted){music.play();musicStarted=true;}
 
-  let music=document.getElementById('bgMusic');
-  if(!musicStarted){
-    music.play().catch(()=>{});
-    musicStarted=true;
-  }
+drawing=true;
 
-  drawing = true;
+let p=rand(players),a=rand(potA),b=rand(potB);
 
-  let p = rand(players);
-  let a = rand(potA);
-  let b = rand(potB);
+setTimeout(()=>{
+document.getElementById('playerWheel').textContent=p;
 
-  // 🎡 SPIN SEQUENCE
-  spin('playerWheel', players, p, 3000, ()=>{
-    spin('potAWheel', potA, a, 3000, ()=>{
-      spin('potBWheel', potB, b, 3000, ()=>{
+setTimeout(()=>{
+document.getElementById('potAWheel').textContent=a;
 
-        // remove drawn items
-        players = players.filter(x=>x!==p);
-        potA = potA.filter(x=>x!==a);
-        potB = potB.filter(x=>x!==b);
-
-        count++;
-
-        // update table
-        resultsBody.innerHTML += `<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`;
-        progress.textContent = count;
-
-        // FLASH
-        flashPlayer.textContent = p;
-        flashPotA.textContent = a;
-        flashPotB.textContent = b;
-
-        flagA.src = `https://flagcdn.com/w80/${flags[a]}.png`;
-        flagB.src = `https://flagcdn.com/w80/${flags[b]}.png`;
-
-        let f = resultFlash;
-        f.style.display='flex';
-        setTimeout(()=>f.style.opacity=1,50);
-
-        drawing = false;
-
-        // hide flash
-        setTimeout(()=>{
-          f.style.opacity=0;
-
-          setTimeout(()=>{
-            f.style.display='none';
-
-            if(players.length){
-              drawNext();
-            } else {
-              showComplete();
-            }
-
-          },1000);
-
-        },3000);
-
-      });
-    });
-  });
-
-}
+setTimeout(()=>{
+document.getElementById('potBWheel').textContent=b;
 
 players=players.filter(x=>x!==p);
 potA=potA.filter(x=>x!==a);
@@ -391,97 +325,7 @@ text+=`${c[0].innerText}. ${c[1].innerText} - ${c[2].innerText} / ${c[3].innerTe
 });
 navigator.clipboard.writeText(text);
 }
-// 🎯 MAIN DRAW DATE
-const drawDate = new Date(Date.now() + 10000);
 
-let phase = 1; // 1 = main countdown, 2 = 20 sec countdown
-
-const screen = document.getElementById('countdownScreen');
-const timer = document.getElementById('countdownTimer');
-const title = document.getElementById('countdownTitle');
-
-function updateCountdown(){
-
-  const now = new Date();
-
-  // ===== PHASE 1 =====
-  if(phase === 1){
-
-    const diff = drawDate - now;
-
-    if(diff <= 0){
-      // fade out main timer
-      screen.style.opacity = 0;
-
-      setTimeout(()=>{
-        // switch to 20 sec phase
-        phase = 2;
-        start20SecondCountdown();
-      },1000);
-
-      return;
-    }
-
-    const d=Math.floor(diff/86400000);
-    const h=Math.floor(diff/3600000)%24;
-    const m=Math.floor(diff/60000)%60;
-    const s=Math.floor(diff/1000)%60;
-
-    timer.textContent = `${d}d ${h}h ${m}m ${s}s`;
-  }
-
-}
-
-setInterval(updateCountdown,1000);
-updateCountdown();
-
-
-// ===== PHASE 2 =====
-function start20SecondCountdown(){
-
-  const music = document.getElementById('bgMusic');
-
-  // 🎵 START MUSIC HERE
-  if(!musicStarted){
-    music.play().catch(()=>{});
-    musicStarted = true;
-  }
-
-  screen.style.opacity = 1;
-
-  title.textContent = "Draw will start in 20 seconds";
-
-  let seconds = 20;
-
-  timer.textContent = seconds;
-
-  const interval = setInterval(()=>{
-
-    seconds--;
-    timer.textContent = seconds;
-
-    if(seconds <= 0){
-      clearInterval(interval);
-
-      // fade out countdown
-      screen.style.opacity = 0;
-
-      setTimeout(()=>{
-        screen.style.display = 'none';
-
-        // 🚀 REMOVE START BUTTON
-        const btn = document.querySelector('.controls');
-        if(btn) btn.style.display = 'none';
-
-        // 🚀 START DRAW
-        drawNext();
-
-      },1000);
-    }
-
-  },1000);
-
-}
 </script>
 
 </body>
