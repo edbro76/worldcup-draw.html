@@ -25,12 +25,10 @@ th,td{padding:12px;border:1px solid #ddd;text-align:center;}
   z-index:9999;color:white;flex-direction:column;justify-content:center;
   align-items:center;text-align:center;opacity:0;transition:opacity 0.8s ease; 
 }
-#flashPlayer{font-size:100px;color:#ffd700;margin-bottom:20px;transition:opacity 0.5s;}
-.flashRow{display:flex;align-items:center;justify-content:center;gap:20px;font-size:60px;margin:10px 0;transition:opacity 0.5s;}
-
-/* Clean Flag Styling */
+#flashPlayer{font-size:110px;color:#ffd700;margin-bottom:20px;transition:opacity 0.5s;text-shadow: 2px 2px 10px rgba(0,0,0,0.5);}
+.flashRow{display:flex;align-items:center;justify-content:center;gap:20px;font-size:70px;margin:10px 0;transition:opacity 0.5s;}
 .flag-box { display: flex; align-items: center; justify-content: center; min-width: 140px; }
-.flag-box img { height: 85px; width: auto; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid #444; }
+.flag-box img { height: 90px; width: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); border: 2px solid #555; }
 
 #countdownScreen{
   position:fixed;inset:0;background:#000;color:#ffd700;
@@ -42,28 +40,25 @@ th,td{padding:12px;border:1px solid #ddd;text-align:center;}
   display:none; position:fixed; inset:0; background:black; z-index:10001;
   color:#ffd700; flex-direction:column; justify-content:center;
   align-items:center; text-align:center; opacity:0; transition:opacity 1.5s ease;
-  font-size: 90px; font-weight: bold; padding: 50px;
+  font-size: 110px; /* Even bigger as requested */
+  font-weight: bold; padding: 50px;
 }
-#finalControls { display: none; margin-top: 20px; }
+#finalControls { display: none; margin-top: 30px; }
 </style>
 </head>
 
 <body onclick="enableAudio()">
-
 <div class="container">
   <h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
   <div class="controls" id="finalControls">
-    <button onclick="downloadPDF()" style="background:#0b3a75; color:white; font-size: 20px;">Download Final Results PDF</button>
+    <button onclick="downloadPDF()" style="background:#0b3a75; color:white; font-size: 24px; padding: 20px 40px;">Download Final Results PDF</button>
   </div>
-
   <div id="messageOverlay"></div>
-
   <div class="wheels">
     <div class="wheel"><div>Player</div><div id="playerWheel" class="value">—</div></div>
     <div class="wheel"><div>Pot A</div><div id="potAWheel" class="value">—</div></div>
     <div class="wheel"><div>Pot B</div><div id="potBWheel" class="value">—</div></div>
   </div>
-
   <h2>Draw Table (<span id="progress">0</span>/24)</h2>
   <table id="resultsTable">
     <thead><tr><th>#</th><th>Player</th><th>Pot A</th><th>Pot B</th></tr></thead>
@@ -79,20 +74,13 @@ th,td{padding:12px;border:1px solid #ddd;text-align:center;}
 
 <div id="resultFlash">
   <div id="flashPlayer"></div>
-  <div id="flashRowA" class="flashRow">
-    <div class="flag-box"><img id="flagA"></div>
-    <div id="flashPotA"></div>
-  </div>
-  <div id="flashRowB" class="flashRow">
-    <div class="flag-box"><img id="flagB"></div>
-    <div id="flashPotB"></div>
-  </div>
+  <div id="flashRowA" class="flashRow"><div class="flag-box"><img id="flagA"></div><div id="flashPotA"></div></div>
+  <div id="flashRowB" class="flashRow"><div class="flag-box"><img id="flagB"></div><div id="flashPotB"></div></div>
 </div>
 
 <audio id="bgMusic" loop><source src="themetune.mp3" type="audio/mpeg"></audio>
 
 <script>
-// FORCE HTTPS IMAGES FOR GITHUB PAGES
 const drawDate = new Date(Date.now() + 10000); 
 let phase = 1, musicStarted = false, count = 0, drawing = false;
 
@@ -107,21 +95,12 @@ function randomItem(a) { return a[Math.floor(Math.random() * a.length)]; }
 
 function enableAudio() {
   const music = document.getElementById('bgMusic');
-  if(!musicStarted) { 
-    music.play().catch(e => console.log("Audio waiting for interaction")); 
-    musicStarted = true; 
-  }
+  if(!musicStarted) { music.play().catch(e => {}); musicStarted = true; }
 }
 
 function downloadPDF() {
   const element = document.getElementById('resultsTable');
-  const opt = { 
-    margin: 0.5, 
-    filename: 'Sweepstake_Results.pdf', 
-    image: { type: 'jpeg', quality: 0.98 }, 
-    html2canvas: { scale: 2, useCORS: true }, 
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } 
-  };
+  const opt = { margin: 0.5, filename: 'Sweepstake_Results.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
   if (typeof html2pdf !== 'undefined') html2pdf().set(opt).from(element).save();
 }
 
@@ -182,8 +161,8 @@ function drawNext() {
         const fP = document.getElementById('flashPlayer'), fRA = document.getElementById('flashRowA'), fRB = document.getElementById('flashRowB');
         fP.style.opacity = "0"; fRA.style.opacity = "0"; fRB.style.opacity = "0";
         fP.textContent = p; document.getElementById('flashPotA').textContent = a; document.getElementById('flashPotB').textContent = b;
-
-        // VERIFIED HTTPS URLS FOR GITHUB PAGES
+        
+        // UPDATED SECURE FLAG LINKS
         document.getElementById('flagA').src = `https://flagcdn.com{flags[a]}.png`;
         document.getElementById('flagB').src = `https://flagcdn.com{flags[b]}.png`;
 
