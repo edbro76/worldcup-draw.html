@@ -92,7 +92,18 @@ const potASeed=['Argentina','Spain','France','England','Portugal','Brazil','Neth
 const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arabia','Qatar','Tunisia','Turkey','Czech Republic','Scotland','Sweden','South Africa','New Zealand','Panama','Haiti','Curaçao','Cape Verde','Jordan','Uzbekistan','Iraq','Ecuador','DR Congo','Bosnia & Herzegovina'];
 
 let players = [...playersSeed], potA = [...potASeed], potB = [...potBSeed];
-const flags={Argentina:"ar",Spain:"es",France:"fr",England:"gb-eng",Portugal:"pt",Brazil:"br",Netherlands:"nl",Belgium:"be",Germany:"de",Croatia:"hr",Morocco:"ma",Colombia:"co",Uruguay:"uy",Mexico:"mx",USA:"us",Switzerland:"ch",Senegal:"sn",Japan:"jp",Iran:"ir","South Korea":"kr",Australia:"au",Austria:"at",Norway:"no",Canada:"ca",Paraguay:"py",Algeria:"dz",Egypt:"eg",Ghana:"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa",Qatar:"qa",Tunisia:"tn",Turkey:"tr","Czech Republic":"cz",Scotland:"gb-sct",Sweden:"se","South Africa":"za","New Zealand":"nz",Panama:"pa",Haiti:"ht","Curaçao":"cw","Cape Verde":"cv",Jordan:"jo",Uzbekistan:"uz",Iraq:"iq",Ecuador:"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"};
+const flags = {
+  // Pot A
+  "Argentina":"ar", "Spain":"es", "France":"fr", "England":"gb-eng", "Portugal":"pt", "Brazil":"br", 
+  "Netherlands":"nl", "Belgium":"be", "Germany":"de", "Croatia":"hr", "Morocco":"ma", "Colombia":"co", 
+  "Uruguay":"uy", "Mexico":"mx", "USA":"us", "Switzerland":"ch", "Senegal":"sn", "Japan":"jp", 
+  "Iran":"ir", "South Korea":"kr", "Australia":"au", "Austria":"at", "Norway":"no", "Canada":"ca",
+  // Pot B
+  "Paraguay":"py", "Algeria":"dz", "Egypt":"eg", "Ghana":"gh", "Cote d'Ivoire":"ci", "Saudi Arabia":"sa", 
+  "Qatar":"qa", "Tunisia":"tn", "Turkey":"tr", "Czech Republic":"cz", "Scotland":"gb-sct", "Sweden":"se", 
+  "South Africa":"za", "New Zealand":"nz", "Panama":"pa", "Haiti":"ht", "Curaçao":"cw", "Cape Verde":"cv", 
+  "Jordan":"jo", "Uzbekistan":"uz", "Iraq":"iq", "Ecuador":"ec", "DR Congo":"cd", "Bosnia & Herzegovina":"ba"
+};
 
 // ===== UTILS =====
 function randomItem(a) { return a[Math.floor(Math.random() * a.length)]; }
@@ -191,8 +202,22 @@ function drawNext() {
 
         // Set Content
         fP.textContent = p;
-document.getElementById('flashPotA').textContent = a;
-document.getElementById('flashPotB').textContent = b;
+        document.getElementById('flashPotA').textContent = a;
+        document.getElementById('flashPotB').textContent = b;
+
+        // Get codes and update sources
+        const codeA = flags[a];
+        const codeB = flags[b];
+        
+        const imgA = document.getElementById('flagA');
+        const imgB = document.getElementById('flagB');
+
+        if(codeA) imgA.src = `https://flagcdn.com{codeA}.png`;
+        if(codeB) imgB.src = `https://flagcdn.com{codeB}.png`;
+
+        // Show Overlay
+        const flash = document.getElementById('resultFlash');
+        flash.style.display = 'flex';
 
 // Use the new helper to find codes
 const codeA = getFlagCode(a);
