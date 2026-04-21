@@ -150,9 +150,7 @@ function drawNext() {
 
   let p = randomItem(players), a = randomItem(potA), b = randomItem(potB);
 
-  spin('playerWheel', players, p, () => {
-    spin('potAWheel', potA, a, () => {
-      spin('potBWheel', potB, b, () => {
+  spin('potBWheel', potB, b, () => {
         players = players.filter(x => x !== p);
         potA = potA.filter(x => x !== a);
         potB = potB.filter(x => x !== b);
@@ -162,16 +160,32 @@ function drawNext() {
           `<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`);
         document.getElementById('progress').textContent = count;
 
+        // 1. Prepare data but keep elements hidden initially
+        const flash = document.getElementById('resultFlash');
+        const fPlayer = document.getElementById('flashPlayer');
+        const fRowA = document.querySelector('.flashRow:nth-of-type(2)');
+        const fRowB = document.querySelector('.flashRow:nth-of-type(3)');
+        
+        fPlayer.style.opacity = "0";
+        fRowA.style.opacity = "0";
+        fRowB.style.opacity = "0";
+
         document.getElementById('flashPlayer').textContent = p;
         document.getElementById('flashPotA').textContent = a;
         document.getElementById('flashPotB').textContent = b;
-        document.getElementById('flagA').src = `https://flagcdn.com/w80/${flags[a]}.png`;
-        document.getElementById('flagB').src = `https://flagcdn.com/w80/${flags[b]}.png`;
+        document.getElementById('flagA').src = `https://flagcdn.com{flags[a]}.png`;
+        document.getElementById('flagB').src = `https://flagcdn.com{flags[b]}.png`;
 
-        const flash = document.getElementById('resultFlash');
+        // 2. Show the black overlay
         flash.style.display = 'flex';
         setTimeout(() => flash.style.opacity = '1', 50);
 
+        // 3. Staggered Reveal (1 second apart)
+        setTimeout(() => { fPlayer.style.opacity = "1"; fPlayer.style.transition = "opacity 0.5s"; }, 1000);
+        setTimeout(() => { fRowA.style.opacity = "1"; fRowA.style.transition = "opacity 0.5s"; }, 2000);
+        setTimeout(() => { fRowB.style.opacity = "1"; fRowB.style.transition = "opacity 0.5s"; }, 3000);
+
+        // 4. Close flash screen after reveal is done
         setTimeout(() => {
           flash.style.opacity = '0';
           setTimeout(() => {
@@ -179,10 +193,8 @@ function drawNext() {
             drawing = false;
             if (players.length > 0) drawNext();
           }, 1000);
-        }, 3000);
+        }, 3000); // Increased total time to allow for the slow reveal
       });
-    });
-  });
 }
 </script>
 </body>
