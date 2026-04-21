@@ -322,10 +322,50 @@ if(!paused) drawNext();
 });
 
 // RESET
-document.addEventListener('keydown',e=>{
-if(e.key.toLowerCase()==='r'){
-if(confirm('Reset draw?')) location.reload();
-}
+document.addEventListener('keydown', e=>{
+  if(e.key.toLowerCase()==='r'){
+
+    if(!confirm('Reset draw?')) return;
+
+    // reset data
+    players=[...playersSeed];
+    potA=[...potASeed];
+    potB=[...potBSeed];
+    count=0;
+    paused=false;
+    drawing=false;
+    musicStarted=false;
+
+    // stop music
+    let music=document.getElementById('bgMusic');
+    music.pause();
+    music.currentTime=0;
+
+    // clear table
+    document.getElementById('resultsBody').innerHTML='';
+    document.getElementById('progress').textContent='0';
+
+    // reset wheels
+    document.getElementById('playerWheel').textContent='—';
+    document.getElementById('potAWheel').textContent='—';
+    document.getElementById('potBWheel').textContent='—';
+
+    // hide flash
+    const flash=document.getElementById('resultFlash');
+    flash.style.opacity='0';
+    setTimeout(()=>flash.style.display='none',500);
+
+    // show start button again
+    document.getElementById('startControls').style.display='flex';
+
+    // bring back countdown screen
+    const screen=document.getElementById('countdownScreen');
+    screen.style.display='flex';
+    screen.style.opacity='1';
+
+    // reset countdown phase
+    phase = 1;
+  }
 });
 
 // COPY
