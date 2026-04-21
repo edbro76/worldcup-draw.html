@@ -221,7 +221,20 @@ let count=0, drawing=false, paused=false, musicStarted=false;
 const flags={Argentina:"ar",Spain:"es",France:"fr",England:"gb-eng",Portugal:"pt",Brazil:"br",Netherlands:"nl",Belgium:"be",Germany:"de",Croatia:"hr",Morocco:"ma",Colombia:"co",Uruguay:"uy",Mexico:"mx",USA:"us",Switzerland:"ch",Senegal:"sn",Japan:"jp",Iran:"ir","South Korea":"kr",Australia:"au",Austria:"at",Norway:"no",Canada:"ca",Paraguay:"py",Algeria:"dz",Egypt:"eg",Ghana:"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa",Qatar:"qa",Tunisia:"tn",Turkey:"tr","Czech Republic":"cz",Scotland:"gb-sct",Sweden:"se","South Africa":"za","New Zealand":"nz",Panama:"pa",Haiti:"ht","Curaçao":"cw","Cape Verde":"cv",Jordan:"jo",Uzbekistan:"uz",Iraq:"iq",Ecuador:"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"};
 
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
+function spin(id, arr, finalValue, duration = 3000, cb){
+  const el = document.getElementById(id);
+  let start = Date.now();
 
+  const interval = setInterval(()=>{
+    el.textContent = arr[Math.floor(Math.random()*arr.length)];
+
+    if(Date.now() - start >= duration){
+      clearInterval(interval);
+      el.textContent = finalValue;
+      if(cb) cb();
+    }
+  }, 100);
+}
 // DRAW
 function drawNext(){
 if(paused||drawing||!players.length)return;
