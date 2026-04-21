@@ -248,14 +248,43 @@ drawing=true;
 
 let p=rand(players),a=rand(potA),b=rand(potB);
 
-setTimeout(()=>{
-document.getElementById('playerWheel').textContent=p;
+spin('playerWheel', players, p, 3000, ()=>{
+  spin('potAWheel', potA, a, 3000, ()=>{
+    spin('potBWheel', potB, b, 3000, ()=>{
 
-setTimeout(()=>{
-document.getElementById('potAWheel').textContent=a;
+      players = players.filter(x=>x!==p);
+      potA = potA.filter(x=>x!==a);
+      potB = potB.filter(x=>x!==b);
+      count++;
 
-setTimeout(()=>{
-document.getElementById('potBWheel').textContent=b;
+      resultsBody.innerHTML += `<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`;
+      progress.textContent = count;
+
+      // FLASH
+      flashPlayer.textContent = p;
+      flashPotA.textContent = a;
+      flashPotB.textContent = b;
+
+      flagA.src = `https://flagcdn.com/w80/${flags[a]}.png`;
+      flagB.src = `https://flagcdn.com/w80/${flags[b]}.png`;
+
+      let f = resultFlash;
+      f.style.display = 'flex';
+      setTimeout(()=>f.style.opacity=1,50);
+
+      drawing = false;
+
+      setTimeout(()=>{
+        f.style.opacity=0;
+        setTimeout(()=>{
+          f.style.display='none';
+          if(players.length) drawNext(); else showComplete();
+        },1000);
+      },3000);
+
+    });
+  });
+});
 
 players=players.filter(x=>x!==p);
 potA=potA.filter(x=>x!==a);
