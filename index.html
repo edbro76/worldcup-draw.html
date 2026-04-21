@@ -6,12 +6,7 @@
 <title>Cerro Gordo World Cup Sweepstake Live Draw</title>
 
 <style>
-body{
-  font-family:Arial,sans-serif;
-  background:#2b2b2b;
-  margin:0;
-  padding:20px;
-}
+body{font-family:Arial;background:#2b2b2b;margin:0;padding:20px}
 .container{max-width:1200px;margin:auto}
 h1,h2{text-align:center;color:white}
 
@@ -26,7 +21,6 @@ button{
   border:none;
   border-radius:10px;
   cursor:pointer;
-  font-size:16px;
 }
 
 .wheels{
@@ -44,15 +38,8 @@ button{
 }
 .value{font-size:30px;font-weight:bold;color:#0b3a75}
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  background:white;
-}
-th,td{
-  padding:10px;
-  border:1px solid #ddd;
-}
+table{width:100%;border-collapse:collapse;background:white}
+th,td{padding:10px;border:1px solid #ddd}
 
 /* FLASH */
 #resultFlash{
@@ -72,9 +59,9 @@ th,td{
 }
 
 #flashPlayer{
-  font-size:150px;
+  font-size:140px;
   color:#ffd700;
-  margin-bottom:40px;
+  margin-bottom:30px;
 }
 
 .flashRow{
@@ -82,12 +69,10 @@ th,td{
   align-items:center;
   justify-content:center;
   gap:20px;
-  font-size:90px;
+  font-size:80px;
 }
 
-.flashRow img{
-  height:90px;
-}
+.flashRow img{height:80px}
 
 /* COUNTDOWN */
 #countdownScreen{
@@ -195,7 +180,6 @@ setInterval(()=>{
 },1000);
 
 function start20(){
-
   const music=document.getElementById('bgMusic');
   if(!musicStarted){music.play();musicStarted=true;}
 
@@ -225,27 +209,20 @@ function start20(){
 
 // ===== DATA =====
 const playersSeed=['Audrey','Ed','Liz','Andy','Carys','Mike','Steve B','Mary','June','Ray','Ian M','Margaret M','Jean','Elaine','Trevor','Sheila','Dave','Roy 1','Roy 2','Maria','Gill','Len','Fiona','Craig'];
+
 const potASeed=['Argentina','Spain','France','England','Portugal','Brazil','Netherlands','Belgium','Germany','Croatia','Morocco','Colombia','Uruguay','Mexico','USA','Switzerland','Senegal','Japan','Iran','South Korea','Australia','Austria','Norway','Canada'];
+
 const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arabia','Qatar','Tunisia','Turkey','Czech Republic','Scotland','Sweden','South Africa','New Zealand','Panama','Haiti','Curaçao','Cape Verde','Jordan','Uzbekistan','Iraq','Ecuador','DR Congo','Bosnia & Herzegovina'];
 
 let players=[...playersSeed], potA=[...potASeed], potB=[...potBSeed];
 let count=0, drawing=false, paused=false, musicStarted=false;
 
 // FLAGS
-const flags={ "Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng","Portugal":"pt","Brazil":"br","Netherlands":"nl","Belgium":"be","Germany":"de","Croatia":"hr","Morocco":"ma","Colombia":"co","Uruguay":"uy","Mexico":"mx","USA":"us","Switzerland":"ch","Senegal":"sn","Japan":"jp","Iran":"ir","South Korea":"kr","Australia":"au","Austria":"at","Norway":"no","Canada":"ca","Paraguay":"py","Algeria":"dz","Egypt":"eg","Ghana":"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa","Qatar":"qa","Tunisia":"tn","Turkey":"tr","Czech Republic":"cz","Scotland":"gb-sct","Sweden":"se","South Africa":"za","New Zealand":"nz","Panama":"pa","Haiti":"ht","Curaçao":"cw","Cape Verde":"cv","Jordan":"jo","Uzbekistan":"uz","Iraq":"iq","Ecuador":"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba" };
+const flags={Argentina:"ar",Spain:"es",France:"fr",England:"gb-eng",Portugal:"pt",Brazil:"br",Netherlands:"nl",Belgium:"be",Germany:"de",Croatia:"hr",Morocco:"ma",Colombia:"co",Uruguay:"uy",Mexico:"mx",USA:"us",Switzerland:"ch",Senegal:"sn",Japan:"jp",Iran:"ir","South Korea":"kr",Australia:"au",Austria:"at",Norway:"no",Canada:"ca",Paraguay:"py",Algeria:"dz",Egypt:"eg",Ghana:"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa",Qatar:"qa",Tunisia:"tn",Turkey:"tr","Czech Republic":"cz",Scotland:"gb-sct",Sweden:"se","South Africa":"za","New Zealand":"nz",Panama:"pa",Haiti:"ht","Curaçao":"cw","Cape Verde":"cv",Jordan:"jo",Uzbekistan:"uz",Iraq:"iq",Ecuador:"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"};
 
-function randomItem(a){return a[Math.floor(Math.random()*a.length)]}
+function rand(a){return a[Math.floor(Math.random()*a.length)]}
 
-// SPIN
-function spin(id,arr,val,cb){
-let t=0,el=document.getElementById(id);
-let i=setInterval(()=>{
-el.textContent=randomItem(arr);
-if(++t>=30){clearInterval(i);el.textContent=val;cb();}
-},100);
-}
-
-// DRAW (UNCHANGED)
+// DRAW
 function drawNext(){
 if(paused||drawing||!players.length)return;
 
@@ -256,11 +233,16 @@ if(!musicStarted){music.play();musicStarted=true;}
 
 drawing=true;
 
-let p=randomItem(players),a=randomItem(potA),b=randomItem(potB);
+let p=rand(players),a=rand(potA),b=rand(potB);
 
-spin('playerWheel',players,p,()=>{
-spin('potAWheel',potA,a,()=>{
-spin('potBWheel',potB,b,()=>{
+setTimeout(()=>{
+document.getElementById('playerWheel').textContent=p;
+
+setTimeout(()=>{
+document.getElementById('potAWheel').textContent=a;
+
+setTimeout(()=>{
+document.getElementById('potBWheel').textContent=b;
 
 players=players.filter(x=>x!==p);
 potA=potA.filter(x=>x!==a);
@@ -270,10 +252,10 @@ count++;
 resultsBody.innerHTML+=`<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`;
 progress.textContent=count;
 
+// FLASH
 flashPlayer.textContent=p;
 flashPotA.textContent=a;
 flashPotB.textContent=b;
-
 flagA.src=`https://flagcdn.com/w80/${flags[a]}.png`;
 flagB.src=`https://flagcdn.com/w80/${flags[b]}.png`;
 
@@ -291,12 +273,58 @@ if(players.length) drawNext(); else showComplete();
 },1000);
 },3000);
 
-});
-});
-});
+},3000);
+},3000);
+},3000);
 }
 
-// COMPLETE / PAUSE / RESET / COPY (UNCHANGED)
+// COMPLETE
+function showComplete(){
+
+  setTimeout(()=>{
+
+    const flash = document.getElementById('resultFlash');
+
+    flashPlayer.textContent='🏆 DRAW COMPLETE';
+    flashPotA.textContent='Thank you for participating';
+    flashPotB.textContent='';
+
+    flash.style.display='flex';
+    setTimeout(()=>flash.style.opacity='1',50);
+
+    setTimeout(()=>{
+      flash.style.opacity='0';
+      setTimeout(()=>flash.style.display='none',1000);
+    },20000);
+
+  },20000);
+
+  ['playerWheel','potAWheel','potBWheel'].forEach(id=>document.getElementById(id).textContent='—');
+}
+
+// PAUSE
+document.addEventListener('contextmenu',e=>{
+e.preventDefault();
+paused=!paused;
+if(!paused) drawNext();
+});
+
+// RESET
+document.addEventListener('keydown',e=>{
+if(e.key.toLowerCase()==='r'){
+if(confirm('Reset draw?')) location.reload();
+}
+});
+
+// COPY
+function copyResults(){
+let text="Cerro Gordo World Cup Sweepstake Results\n\n";
+document.querySelectorAll("#resultsBody tr").forEach(r=>{
+let c=r.children;
+text+=`${c[0].innerText}. ${c[1].innerText} - ${c[2].innerText} / ${c[3].innerText}\n`;
+});
+navigator.clipboard.writeText(text);
+}
 
 </script>
 
