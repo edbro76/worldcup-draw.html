@@ -220,6 +220,10 @@ document.getElementById('flagB').src = `https://flagcdn.com/w80/${flags[b]}.png`
           flash.style.opacity = '0';
           setTimeout(() => {
             flash.style.display = 'none';
+            // ✅ CLEAR WHEELS HERE
+document.getElementById('playerWheel').textContent = '—';
+document.getElementById('potAWheel').textContent = '—';
+document.getElementById('potBWheel').textContent = '—';
             drawing = false;
             if (players.length > 0) drawNext(); else showEndSequence();
           }, 800);
