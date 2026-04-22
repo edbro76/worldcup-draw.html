@@ -109,7 +109,17 @@ function randomItem(a) { return a[Math.floor(Math.random() * a.length)]; }
 
 function enableAudio() {
   const music = document.getElementById('bgMusic');
-  if(!musicStarted) { music.play().catch(e => {}); musicStarted = true; }
+
+  if (!musicStarted) {
+    music.volume = 1;
+    music.muted = false;
+
+    music.play().then(() => {
+      music.pause();
+      music.currentTime = 0;
+      musicStarted = false;
+    }).catch(()=>{});
+  }
 }
 
 function downloadPDF() {
