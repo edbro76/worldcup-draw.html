@@ -70,8 +70,18 @@ th,td{padding:12px;border:1px solid #ddd;text-align:center;}
 
 <div id="countdownScreen">
   <div id="countdownStatus" style="font-size:60px;margin-bottom:20px;">Draw Starts In</div>
+
   <div id="countdownTimer" style="font-size:90px;"></div>
-  <div style="font-size:20px; margin-top:20px; color:#aaa;">(Click anywhere once to enable music)</div>
+
+  <div style="font-size:20px; margin-top:20px; color:#aaa;">
+    Click below to enable music
+  </div>
+
+  <!-- ✅ ADD THIS BUTTON -->
+  <button onclick="enableAudio()" style="margin-top:20px;font-size:20px;padding:12px 24px;">
+    Enable Sound
+  </button>
+
 </div>
 
 <div id="resultFlash">
@@ -144,7 +154,12 @@ setInterval(() => {
 }, 100);
 
 function start20() {
-  enableAudio();
+  const music = document.getElementById('bgMusic');
+
+if (!musicStarted) {
+  music.play().catch(()=>{});
+  musicStarted = true;
+}
   document.getElementById('countdownStatus').textContent = "Final Countdown...";
   let sec = 20;
   let i = setInterval(() => {
