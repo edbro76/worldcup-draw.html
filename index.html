@@ -104,8 +104,16 @@ function enableAudio() {
 
 function downloadPDF() {
   const element = document.getElementById('resultsTable');
-  const opt = { margin: 0.5, filename: 'Sweepstake_Results.pdf', html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
-  if (typeof html2pdf !== 'undefined') html2pdf().set(opt).from(element).save();
+
+  const opt = {
+    margin: 0.5,
+    filename: 'Cerro_Gordo_Sweepstake_Results.pdf',
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(element).save();
 }
 
 function showEndSequence() {
