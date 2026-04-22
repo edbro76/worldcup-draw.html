@@ -93,7 +93,7 @@ th,td{padding:12px;border:1px solid #ddd;text-align:center;}
 <audio id="bgMusic" loop><source src="themetune.mp3" type="audio/mpeg"></audio>
 
 <script>
-const drawDate = new Date(Date.now() + 10000); 
+const drawDate = new Date("May 24, 2026 19:00:00");
 let phase = 1, musicStarted = false, count = 0, drawing = false;
 
 const playersSeed=['Audrey','Ed','Liz','Andy','Carys','Mike','Steve B','Mary','June','Ray','Ian M','Margaret M','Jean','Elaine','Trevor','Sheila','Dave','Roy 1','Roy 2','Maria','Gill','Len','Fiona','Craig'];
@@ -159,7 +159,13 @@ setInterval(() => {
   if (phase === 1) {
     const diff = drawDate - Date.now();
     if (diff <= 0) { phase = 2; start20(); return; }
-    document.getElementById('countdownTimer').textContent = Math.floor(diff / 1000) + "s";
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+const minutes = Math.floor((diff / (1000 * 60)) % 60);
+const seconds = Math.floor((diff / 1000) % 60);
+
+document.getElementById('countdownTimer').textContent =
+  `${days}d ${hours}h ${minutes}m ${seconds}s`;
   }
 }, 100);
 
