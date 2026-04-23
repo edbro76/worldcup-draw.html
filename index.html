@@ -4,239 +4,213 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cerro Gordo World Cup Sweepstake Live Draw</title>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 <style>
-body{font-family:Arial, sans-serif;background:#2b2b2b;margin:0;padding:20px}
+body{font-family:Arial;background:#2b2b2b;margin:0;padding:20px}
 .container{max-width:1200px;margin:auto}
 h1,h2{text-align:center;color:white}
-.controls{display:flex;justify-content:center;gap:15px;margin:20px 0;}
-button{padding:12px 24px;border:none;border-radius:10px;cursor:pointer;background:#ffd700;font-weight:bold;color:black;}
-.wheels{display:flex;justify-content:center;gap:30px;margin:30px 0;}
-.wheel{background:white;padding:25px 40px;border-radius:20px;text-align:center;min-width:220px;}
+
+.controls{text-align:center;margin:20px 0}
+button{padding:12px 24px;border:none;border-radius:10px;cursor:pointer;background:#ffd700;font-weight:bold}
+
+.wheels{display:flex;justify-content:center;gap:30px;margin:30px 0}
+.wheel{background:white;padding:25px 40px;border-radius:20px;text-align:center;min-width:220px}
 .value{font-size:30px;font-weight:bold;color:#0b3a75}
+
 table{width:100%;border-collapse:collapse;background:white}
-th,td{padding:12px;border:1px solid #ddd;text-align:center;}
+th,td{padding:12px;border:1px solid #ddd;text-align:center}
 
+/* FLASH */
 #resultFlash{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);
   z-index:9999;color:white;flex-direction:column;justify-content:center;
-  align-items:center;text-align:center;opacity:0;transition:opacity 0.8s ease; 
+  align-items:center;text-align:center;opacity:0;transition:opacity 1s;
 }
-#flashPlayer{font-size:110px;color:#ffd700;margin-bottom:20px;transition:opacity 0.5s;}
-.flashRow{display:flex;align-items:center;justify-content:center;gap:20px;font-size:70px;margin:10px 0;transition:opacity 0.5s;}
+#flashPlayer{font-size:140px;color:#ffd700;margin-bottom:20px}
+.flashRow{display:flex;align-items:center;gap:20px;font-size:80px}
+.flashRow img{height:80px}
 
-/* Enhanced Flag Container */
-.flag-box { display: flex; align-items: center; justify-content: center; min-width: 140px; min-height: 90px; }
-.flag-box img { 
-  height: 85px; width: auto; border-radius: 6px; 
-  box-shadow: 0 4px 15px rgba(0,0,0,0.6); border: 1px solid #444;
-  background: #333; /* Dark placeholder while loading */
-}
-
+/* COUNTDOWN */
 #countdownScreen{
-  position:fixed;inset:0;background:#000;color:#ffd700;
+  position:fixed;inset:0;background:black;color:#ffd700;
   display:flex;flex-direction:column;justify-content:center;
-  align-items:center;z-index:10000;text-align:center;transition:opacity 1s;
+  align-items:center;z-index:10000;text-align:center;
 }
 
-#messageOverlay {
-  display:none; position:fixed; inset:0; background:black; z-index:10001;
-  color:#ffd700; flex-direction:column; justify-content:center;
-  align-items:center; text-align:center; opacity:0; transition:opacity 1.5s ease;
-  font-size: 110px; font-weight: bold; padding: 50px;
+/* END MESSAGE */
+#endMessage{
+  display:none;position:fixed;inset:0;background:black;color:#ffd700;
+  z-index:10001;justify-content:center;align-items:center;
+  flex-direction:column;font-size:100px;text-align:center;
 }
-#finalControls { display: none; margin-top: 30px; }
 </style>
 </head>
 
 <body onclick="enableAudio()">
+
 <div class="container">
-  <h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
-  <div class="controls" id="finalControls">
-    <button onclick="downloadPDF()" style="background:#0b3a75; color:white; font-size: 24px; padding: 20px 40px;">Download Final Results PDF</button>
-  </div>
-  <div id="messageOverlay"></div>
-  <div class="wheels">
-    <div class="wheel"><div>Player</div><div id="playerWheel" class="value">—</div></div>
-    <div class="wheel"><div>Pot A</div><div id="potAWheel" class="value">—</div></div>
-    <div class="wheel"><div>Pot B</div><div id="potBWheel" class="value">—</div></div>
-  </div>
-  <h2>Draw Table (<span id="progress">0</span>/24)</h2>
-  <table id="resultsTable">
-    <thead><tr><th>#</th><th>Player</th><th>Pot A</th><th>Pot B</th></tr></thead>
-    <tbody id="resultsBody"></tbody>
-  </table>
+<h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
+
+<div class="wheels">
+<div class="wheel"><div>Player</div><div id="playerWheel" class="value">—</div></div>
+<div class="wheel"><div>Pot A</div><div id="potAWheel" class="value">—</div></div>
+<div class="wheel"><div>Pot B</div><div id="potBWheel" class="value">—</div></div>
 </div>
 
+<h2>Draw Table (<span id="progress">0</span>/24)</h2>
+
+<table id="resultsTable">
+<thead><tr><th>#</th><th>Player</th><th>Pot A</th><th>Pot B</th></tr></thead>
+<tbody id="resultsBody"></tbody>
+</table>
+
+<div class="controls">
+<button onclick="downloadPDF()">Download PDF</button>
+</div>
+
+</div>
+
+<!-- COUNTDOWN -->
 <div id="countdownScreen">
-  <div id="countdownStatus" style="font-size:60px;margin-bottom:20px;">Draw Starts In</div>
-
+  <div style="font-size:60px;margin-bottom:20px;">Draw Starts In</div>
   <div id="countdownTimer" style="font-size:90px;"></div>
-
-  <div style="font-size:20px; margin-top:20px; color:#aaa;">
-    Click below to enable music
-  </div>
-
-  <!-- ✅ ADD THIS BUTTON -->
-  <button onclick="enableAudio()" style="margin-top:20px;font-size:20px;padding:12px 24px;">
-    Enable Sound
-  </button>
-
 </div>
 
+<!-- FLASH -->
 <div id="resultFlash">
   <div id="flashPlayer"></div>
-  <div id="flashRowA" class="flashRow"><div class="flag-box"><img id="flagA"></div><div id="flashPotA"></div></div>
-  <div id="flashRowB" class="flashRow"><div class="flag-box"><img id="flagB"></div><div id="flashPotB"></div></div>
+  <div class="flashRow"><img id="flagA"><div id="flashPotA"></div></div>
+  <div class="flashRow"><img id="flagB"><div id="flashPotB"></div></div>
 </div>
 
-<audio id="bgMusic" loop><source src="themetune.mp3" type="audio/mpeg"></audio>
+<!-- END -->
+<div id="endMessage">
+  <div>🏆 DRAW COMPLETE</div>
+  <div style="font-size:40px;margin-top:20px;">Results below</div>
+</div>
+
+<audio id="bgMusic" loop>
+  <source src="themetune.mp3" type="audio/mpeg">
+</audio>
 
 <script>
-  const HOST_KEY = "cerro2026"; // choose your own
-const urlParams = new URLSearchParams(window.location.search);
-const isHost = urlParams.get("host") === HOST_KEY;
-const drawDate = new Date(Date.now() + 10000);
-let phase = 1, musicStarted = false, count = 0, drawing = false;
 
-const playersSeed=['Audrey','Ed','Liz','Andy','Carys','Mike','Steve B','Mary','June','Ray','Ian M','Margaret M','Jean','Elaine','Trevor','Sheila','Dave','Roy 1','Roy 2','Maria','Gill','Len','Fiona','Craig'];
-const potASeed=['Argentina','Spain','France','England','Portugal','Brazil','Netherlands','Belgium','Germany','Croatia','Morocco','Colombia','Uruguay','Mexico','USA','Switzerland','Senegal','Japan','Iran','South Korea','Australia','Austria','Norway','Canada'];
-const potBSeed=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arabia','Qatar','Tunisia','Turkey','Czech Republic','Scotland','Sweden','South Africa','New Zealand','Panama','Haiti','Curaçao','Cape Verde','Jordan','Uzbekistan','Iraq','Ecuador','DR Congo','Bosnia & Herzegovina'];
+// ===== DATE (SET YOUR REAL DATE HERE) =====
+const drawDate = new Date("May 24, 2026 19:00:00");
 
-let players = [...playersSeed], potA = [...potASeed], potB = [...potBSeed];
+// ===== STATE =====
+let players=['Audrey','Ed','Liz','Andy','Carys','Mike','Steve B','Mary','June','Ray','Ian M','Margaret M','Jean','Elaine','Trevor','Sheila','Dave','Roy 1','Roy 2','Maria','Gill','Len','Fiona','Craig'];
+let potA=['Argentina','Spain','France','England','Portugal','Brazil','Netherlands','Belgium','Germany','Croatia','Morocco','Colombia','Uruguay','Mexico','USA','Switzerland','Senegal','Japan','Iran','South Korea','Australia','Austria','Norway','Canada'];
+let potB=['Paraguay','Algeria','Egypt','Ghana',"Cote d'Ivoire",'Saudi Arabia','Qatar','Tunisia','Turkey','Czech Republic','Scotland','Sweden','South Africa','New Zealand','Panama','Haiti','Curaçao','Cape Verde','Jordan','Uzbekistan','Iraq','Ecuador','DR Congo','Bosnia & Herzegovina'];
 
-// Updated mapping for the Flagpedia API
-const flags = {"Argentina":"ar","Spain":"es","France":"fr","England":"gb-eng","Portugal":"pt","Brazil":"br","Netherlands":"nl","Belgium":"be","Germany":"de","Croatia":"hr","Morocco":"ma","Colombia":"co","Uruguay":"uy","Mexico":"mx","USA":"us","Switzerland":"ch","Senegal":"sn","Japan":"jp","Iran":"ir","South Korea":"kr","Australia":"au","Austria":"at","Norway":"no","Canada":"ca","Paraguay":"py","Algeria":"dz","Egypt":"eg","Ghana":"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa","Qatar":"qa","Tunisia":"tn","Turkey":"tr","Czech Republic":"cz","Scotland":"gb-sct","Sweden":"se","South Africa":"za","New Zealand":"nz","Panama":"pa","Haiti":"ht","Curaçao":"cw","Cape Verde":"cv","Jordan":"jo","Uzbekistan":"uz","Iraq":"iq","Ecuador":"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"};
+let count=0, drawing=false, musicStarted=false;
 
-function randomItem(a) { return a[Math.floor(Math.random() * a.length)]; }
+// FLAGS
+const flags={Argentina:"ar",Spain:"es",France:"fr",England:"gb-eng",Portugal:"pt",Brazil:"br",Netherlands:"nl",Belgium:"be",Germany:"de",Croatia:"hr",Morocco:"ma",Colombia:"co",Uruguay:"uy",Mexico:"mx",USA:"us",Switzerland:"ch",Senegal:"sn",Japan:"jp",Iran:"ir","South Korea":"kr",Australia:"au",Austria:"at",Norway:"no",Canada:"ca",Paraguay:"py",Algeria:"dz",Egypt:"eg",Ghana:"gh","Cote d'Ivoire":"ci","Saudi Arabia":"sa",Qatar:"qa",Tunisia:"tn",Turkey:"tr","Czech Republic":"cz",Scotland:"gb-sct",Sweden:"se","South Africa":"za","New Zealand":"nz",Panama:"pa",Haiti:"ht","Curaçao":"cw","Cape Verde":"cv",Jordan:"jo",Uzbekistan:"uz",Iraq:"iq",Ecuador:"ec","DR Congo":"cd","Bosnia & Herzegovina":"ba"};
 
-function enableAudio() {
-  const music = document.getElementById('bgMusic');
-
-  if (!musicStarted) {
-    music.volume = 1;
-    music.muted = false;
-
-    music.play().then(() => {
-      musicStarted = true;
-    }).catch(() => {
-      console.log("Audio blocked until user interaction");
-    });
+function enableAudio(){
+  const music=document.getElementById('bgMusic');
+  if(!musicStarted){
+    music.play().catch(()=>{});
+    musicStarted=true;
   }
 }
 
-function downloadPDF() {
-  const element = document.getElementById('resultsTable');
-
-  const opt = {
-    margin: 0.5,
-    filename: 'Cerro_Gordo_Sweepstake_Results.pdf',
-    image: { type: 'jpeg', quality: 1 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-  };
-
-  html2pdf().set(opt).from(element).save();
-}
-
-function showEndSequence() {
-  const msg = document.getElementById('messageOverlay');
-  const finalBtn = document.getElementById('finalControls');
-  msg.style.display = 'flex';
-  setTimeout(() => { msg.textContent = "Draw Complete"; msg.style.opacity = "1"; }, 100);
-  setTimeout(() => { msg.style.opacity = "0"; }, 5000);
-  setTimeout(() => { msg.textContent = "Thanks for participating and good luck!"; msg.style.opacity = "1"; }, 6100);
-  setTimeout(() => { msg.style.opacity = "0"; }, 11100);
-  setTimeout(() => { msg.style.display = "none"; finalBtn.style.display = "flex"; }, 12100);
-}
-
-function spin(id, arr, finalValue, cb) {
-  let t = 0, el = document.getElementById(id);
-  let i = setInterval(() => {
-    el.textContent = randomItem(arr);
-    if (++t >= 20) { clearInterval(i); el.textContent = finalValue; if (cb) cb(); }
-  }, 100);
-}
-
-setInterval(() => {
-  if (phase === 1) {
-    const diff = drawDate - Date.now();
-    if (diff <= 0) { phase = 2; start20(); return; }
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-const minutes = Math.floor((diff / (1000 * 60)) % 60);
-const seconds = Math.floor((diff / 1000) % 60);
-
-document.getElementById('countdownTimer').textContent =
-  `${days}d ${hours}h ${minutes}m ${seconds}s`;
+// ===== COUNTDOWN =====
+setInterval(()=>{
+  let diff=drawDate - new Date();
+  if(diff<=0){
+    document.getElementById('countdownScreen').style.display='none';
+    drawNext();
+    return;
   }
-}, 100);
+  let d=Math.floor(diff/86400000);
+  let h=Math.floor(diff/3600000)%24;
+  let m=Math.floor(diff/60000)%60;
+  let s=Math.floor(diff/1000)%60;
+  countdownTimer.textContent=`${d}d ${h}h ${m}m ${s}s`;
+},1000);
 
-function start20() {
-  const music = document.getElementById('bgMusic');
-
-if (!musicStarted) {
-  music.play().catch(()=>{});
-  musicStarted = true;
-}
-  document.getElementById('countdownStatus').textContent = "Final Countdown...";
-  let sec = 20;
-  let i = setInterval(() => {
-    sec--;
-    document.getElementById('countdownTimer').textContent = sec;
-    if (sec <= 0) {
+// ===== SPIN =====
+function spin(id,arr,final,cb){
+  let el=document.getElementById(id);
+  let t=0;
+  let i=setInterval(()=>{
+    el.textContent=arr[Math.floor(Math.random()*arr.length)];
+    if(++t>=20){
       clearInterval(i);
-      document.getElementById('countdownScreen').style.opacity = 0;
-      setTimeout(() => { document.getElementById('countdownScreen').style.display = 'none'; drawNext(); }, 1000);
+      el.textContent=final;
+      cb&&cb();
     }
-  }, 1000);
+  },100);
 }
 
-function drawNext() {
-  if (!isHost) return;
-  if (drawing || !players.length) return;
-  drawing = true;
-  document.getElementById('resultFlash').style.display = 'none';
-  let p = randomItem(players), a = randomItem(potA), b = randomItem(potB);
-  spin('playerWheel', players, p, () => {
-    spin('potAWheel', potA, a, () => {
-      spin('potBWheel', potB, b, () => {
-        players = players.filter(x => x !== p); potA = potA.filter(x => x !== a); potB = potB.filter(x => x !== b);
-        count++;
-        document.getElementById('resultsBody').insertAdjacentHTML('beforeend', `<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`);
-        document.getElementById('progress').textContent = count;
-        
-        const fP = document.getElementById('flashPlayer'), fRA = document.getElementById('flashRowA'), fRB = document.getElementById('flashRowB');
-        fP.style.opacity = "0"; fRA.style.opacity = "0"; fRB.style.opacity = "0";
-        fP.textContent = p; document.getElementById('flashPotA').textContent = a; document.getElementById('flashPotB').textContent = b;
-        
-        // NEW FLAGPEDIA CDN LINKS (Highly reliable for HTTPS)
-        document.getElementById('flagA').src = `https://flagcdn.com/w80/${flags[a]}.png`;
-document.getElementById('flagB').src = `https://flagcdn.com/w80/${flags[b]}.png`;
+// ===== DRAW =====
+function drawNext(){
+  if(drawing||!players.length)return;
+  drawing=true;
 
-        const flash = document.getElementById('resultFlash');
-        flash.style.display = 'flex';
-        setTimeout(() => flash.style.opacity = '1', 50);
-        setTimeout(() => { fP.style.opacity = "1"; }, 1000); 
-        setTimeout(() => { fRA.style.opacity = "1"; }, 1800); 
-        setTimeout(() => { fRB.style.opacity = "1"; }, 2600); 
-        setTimeout(() => {
-          flash.style.opacity = '0';
-          setTimeout(() => {
-            flash.style.display = 'none';
-            // ✅ CLEAR WHEELS HERE
-document.getElementById('playerWheel').textContent = '—';
-document.getElementById('potAWheel').textContent = '—';
-document.getElementById('potBWheel').textContent = '—';
-            drawing = false;
-            if (players.length > 0) drawNext(); else showEndSequence();
-          }, 800);
-        }, 5500); 
+  let p=players.splice(Math.floor(Math.random()*players.length),1)[0];
+  let a=potA.splice(Math.floor(Math.random()*potA.length),1)[0];
+  let b=potB.splice(Math.floor(Math.random()*potB.length),1)[0];
+
+  spin('playerWheel',players,p,()=>{
+    spin('potAWheel',potA,a,()=>{
+      spin('potBWheel',potB,b,()=>{
+
+        count++;
+        resultsBody.innerHTML+=`<tr><td>${count}</td><td>${p}</td><td>${a}</td><td>${b}</td></tr>`;
+        progress.textContent=count;
+
+        flashPlayer.textContent=p;
+        flashPotA.textContent=a;
+        flashPotB.textContent=b;
+        flagA.src=`https://flagcdn.com/w80/${flags[a]}.png`;
+        flagB.src=`https://flagcdn.com/w80/${flags[b]}.png`;
+
+        let f=resultFlash;
+        f.style.display='flex';
+        setTimeout(()=>f.style.opacity=1,50);
+
+        setTimeout(()=>{
+          f.style.opacity=0;
+          setTimeout(()=>{
+            f.style.display='none';
+
+            // CLEAR WHEELS
+            playerWheel.textContent='—';
+            potAWheel.textContent='—';
+            potBWheel.textContent='—';
+
+            drawing=false;
+
+            if(players.length) drawNext();
+            else finishDraw();
+
+          },800);
+        },3000);
+
       });
     });
   });
 }
-  
+
+// ===== END =====
+function finishDraw(){
+  let end=document.getElementById('endMessage');
+  setTimeout(()=>{
+    end.style.display='flex';
+  },3000);
+}
+
+// ===== PDF =====
+function downloadPDF(){
+  html2pdf().from(document.getElementById('resultsTable')).save();
+}
+
 </script>
+
 </body>
 </html>
