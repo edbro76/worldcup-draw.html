@@ -93,6 +93,9 @@ th,td{padding:12px;border:1px solid #ddd;text-align:center;}
 <audio id="bgMusic" loop><source src="themetune.mp3" type="audio/mpeg"></audio>
 
 <script>
+  const HOST_KEY = "cerro2026"; // choose your own
+const urlParams = new URLSearchParams(window.location.search);
+const isHost = urlParams.get("host") === HOST_KEY;
 const drawDate = new Date(Date.now() + 10000);
 let phase = 1, musicStarted = false, count = 0, drawing = false;
 
@@ -190,6 +193,7 @@ if (!musicStarted) {
 }
 
 function drawNext() {
+  if (!isHost) return;
   if (drawing || !players.length) return;
   drawing = true;
   document.getElementById('resultFlash').style.display = 'none';
@@ -232,6 +236,7 @@ document.getElementById('potBWheel').textContent = '—';
     });
   });
 }
+  
 </script>
 </body>
 </html>
