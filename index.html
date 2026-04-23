@@ -221,14 +221,15 @@ function finishDraw(){
   let end = document.getElementById('endMessage');
 
   setTimeout(()=>{
-    end.style.display = 'flex';
+    end.style.opacity = 1;
 
     // ⏱ show message for 8 seconds
     setTimeout(()=>{
-      end.style.display = 'none';
-    }, 8000);
-
-  },3000);
+  end.style.opacity = 0;
+  setTimeout(()=>{
+    end.style.display = 'none';
+  },1000);
+},8000);
 }
 
 // ===== PDF =====
