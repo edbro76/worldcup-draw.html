@@ -115,10 +115,10 @@ function enableAudio() {
     music.muted = false;
 
     music.play().then(() => {
-      music.pause();
-      music.currentTime = 0;
-      musicStarted = false;
-    }).catch(()=>{});
+      musicStarted = true;
+    }).catch(() => {
+      console.log("Audio blocked until user interaction");
+    });
   }
 }
 
