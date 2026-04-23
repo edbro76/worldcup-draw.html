@@ -48,7 +48,7 @@ th,td{padding:12px;border:1px solid #ddd;text-align:center}
 </style>
 </head>
 
-<body onclick="enableAudio()">
+<body onclick="startCountdown()">
 
 <div class="container">
 <h1>Cerro Gordo World Cup Sweepstake Live Draw</h1>
@@ -74,7 +74,7 @@ th,td{padding:12px;border:1px solid #ddd;text-align:center}
 
 <!-- COUNTDOWN -->
 <div id="countdownScreen">
-  <div style="font-size:60px;margin-bottom:20px;">Draw Starts In</div>
+  <div style="font-size:60px;margin-bottom:20px;">Draw Starting Soon</div>
   <div id="countdownTimer" style="font-size:90px;"></div>
 </div>
 
@@ -119,19 +119,38 @@ function enableAudio(){
 }
 
 // ===== COUNTDOWN =====
-setInterval(()=>{
-  let diff=drawDate - new Date();
-  if(diff<=0){
-    document.getElementById('countdownScreen').style.display='none';
-    drawNext();
-    return;
-  }
-  let d=Math.floor(diff/86400000);
-  let h=Math.floor(diff/3600000)%24;
-  let m=Math.floor(diff/60000)%60;
-  let s=Math.floor(diff/1000)%60;
-  countdownTimer.textContent=`${d}d ${h}h ${m}m ${s}s`;
-},1000);
+let countdownStarted = false;
+
+function startCountdown(){
+  if(countdownStarted) return;
+  countdownStarted = true;
+
+  enableAudio(); // start music immediately
+
+  let screen = document.getElementById('countdownScreen');
+  let timer = document.getElementById('countdownTimer');
+
+  let sec = 60;
+
+  timer.textContent = sec;
+
+  let i = setInterval(()=>{
+    sec--;
+    timer.textContent = sec;
+
+    if(sec <= 0){
+      clearInterval(i);
+
+      screen.style.opacity = 0;
+
+      setTimeout(()=>{
+        screen.style.display = 'none';
+        drawNext(); // start draw
+      },1000);
+    }
+
+  },1000);
+}
 
 // ===== SPIN =====
 function spin(id,arr,final,cb){
