@@ -218,18 +218,17 @@ function drawNext(){
 
 // ===== END =====
 function finishDraw(){
-  let end = document.getElementById('endMessage');
+   let end = document.getElementById('endMessage');
 
   setTimeout(()=>{
-    end.style.opacity = 1;
+    end.style.display = 'flex';
 
     // ⏱ show message for 8 seconds
     setTimeout(()=>{
-  end.style.opacity = 0;
-  setTimeout(()=>{
-    end.style.display = 'none';
-  },1000);
-},8000);
+      end.style.display = 'none';
+    }, 8000);
+
+  },3000);
 }
 
 // ===== PDF =====
