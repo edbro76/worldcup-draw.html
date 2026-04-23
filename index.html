@@ -218,9 +218,16 @@ function drawNext(){
 
 // ===== END =====
 function finishDraw(){
-  let end=document.getElementById('endMessage');
+  let end = document.getElementById('endMessage');
+
   setTimeout(()=>{
-    end.style.display='flex';
+    end.style.display = 'flex';
+
+    // ⏱ show message for 8 seconds
+    setTimeout(()=>{
+      end.style.display = 'none';
+    }, 8000);
+
   },3000);
 }
 
