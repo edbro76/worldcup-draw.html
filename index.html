@@ -220,11 +220,7 @@ function drawNext(){
 function finishDraw(){
   let end = document.getElementById('endMessage');
 
-  setTimeout(()=>{
-    end.style.display = 'flex';
-
-    // ⏱ show message for 8 seconds
-    end.style.opacity = 1;
+  end.style.opacity = 1;
 
 setTimeout(()=>{
   end.style.opacity = 0;
