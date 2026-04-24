@@ -44,6 +44,8 @@ th,td{padding:12px;border:1px solid #ddd;text-align:center}
   display:none;position:fixed;inset:0;background:black;color:#ffd700;
   z-index:10001;justify-content:center;align-items:center;
   flex-direction:column;font-size:100px;text-align:center;
+  opacity:0;
+  transition:opacity 1s ease;
 }
 </style>
 </head>
@@ -223,17 +225,23 @@ function finishDraw(){
   setTimeout(()=>{
     end.style.display = 'flex';
 
-    // ⏱ show message for 8 seconds
+    // small delay so transition works
     setTimeout(()=>{
-      end.style.display = 'none';
-    }, 8000);
+      end.style.opacity = 1;
+    },50);
+
+    // stay visible
+    setTimeout(()=>{
+      end.style.opacity = 0;
+
+      // hide after fade out
+      setTimeout(()=>{
+        end.style.display = 'none';
+      },1000);
+
+    },8000);
 
   },3000);
-}
-
-// ===== PDF =====
-function downloadPDF(){
-  html2pdf().from(document.getElementById('resultsTable')).save();
 }
 
 </script>
