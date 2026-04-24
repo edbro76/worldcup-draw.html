@@ -243,7 +243,19 @@ function finishDraw(){
 
   },3000);
 }
+function downloadPDF(){
 
+  const element = document.getElementById('resultsTable');
+
+  html2pdf().set({
+    margin: 0.5,
+    filename: 'Cerro_Gordo_Sweepstake_Results.pdf',
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+  }).from(element).save();
+
+}
 </script>
 
 </body>
